@@ -142,7 +142,14 @@
 <h3 id="1-2线性方程组的解的情况及其判别准则">1.2线性方程组的解的情况及其判别准则</h3>
 <p>1、定理1：系数为有理数（或实数、复数）的你元线性方程组的解的情况只有三种可能：1）无解、2）有唯一解、3）有无穷多个解。</p>
 <p><strong>高斯-约当</strong>算法：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">graph TD</span><br><span class="line">01[&quot;线性方程组的增广矩阵&quot;]--&gt;| 初等行变换|02[&quot;阶梯形矩阵&quot;]</span><br><span class="line">02--&gt;03&#123;&quot;是否出现“0=d?”&quot;&#125;</span><br><span class="line">03--&gt;|是|04[&quot;原方程无解&quot;]</span><br><span class="line">03--&gt;|否 初等行变换|05[&quot;简化行阶梯形矩阵&quot;]</span><br><span class="line">05--&gt;06&#123;&quot;非零行数目=未知量数目？&quot;&#125;</span><br><span class="line">06--&gt;|是|07[&quot;原方程有唯一解&quot;]</span><br><span class="line">06--&gt;|否 初等行变换|08[&quot;有无穷多个解&quot;]</span><br></pre></td></tr></table></figure>
+<pre class="mermaid">graph TD
+01["线性方程组的增广矩阵"]-->| 初等行变换|02["阶梯形矩阵"]
+02-->03{"是否出现“0=d?”"}
+03-->|是|04["原方程无解"]
+03-->|否 初等行变换|05["简化行阶梯形矩阵"]
+05-->06{"非零行数目=未知量数目？"}
+06-->|是|07["原方程有唯一解"]
+06-->|否 初等行变换|08["有无穷多个解"]</pre>
 <p>如果一个线性方程组有解，那么称它是相容的；否则，称它是不相容的。关键词：齐次线性方程组、零解、非零解</p>
 <p>2、推论1：n元齐次线性方程组有非零解的充分必要是：它的系数矩阵经过初等行变换化成的阶梯形矩阵中，非零行的数目r&lt;n。</p>
 <p>3、推论2：n元齐次线性方程组如果方程的数目s小于未知量的数目n，那么它一定有非零解。</p>
@@ -255,7 +262,16 @@ c-10,0,-16.667,5,-20,15z M188 15 H145 v585 v6000 v585 h43z"/></svg></span></span
 <p>5、性质5：两行相同，行列式的值为0。</p>
 <p>6、性质6：两行成比例，行列式的值为0。</p>
 <p>7、性质7：把一行的倍数加到另一行上，行列式的值不变。</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">graph TD</span><br><span class="line"> 00[行列式定义]--&gt; 01[&quot;性质1：行列互换&lt;br /&gt;，行列式的值不变&quot;]</span><br><span class="line"> 00 --&gt; 03[&quot;性质3：行列式中若是有某一行是两&lt;br /&gt;组数的和，则此行列式等于两个行列&lt;br /&gt;式的和，这两个行列式的这一行分别&lt;br /&gt;是第一组数和第二组数，而其余各行&lt;br /&gt;与原来行列式的相应各行相同。&quot;]</span><br><span class="line"> 00 --&gt; 02[&quot;性质2：行列式一行的&lt;br /&gt;公因子可以提出去。&quot;]</span><br><span class="line"> 00 --&gt; 04[&quot;性质4：两行互换&lt;br /&gt;，行列式反号。&quot;]</span><br><span class="line"> 04 --&gt; 05[&quot;性质5：两行相同&lt;br /&gt;，行列式的值为0。&quot;]</span><br><span class="line"> 02 --&gt; 06[&quot;性质6：两行成比&lt;br /&gt;例，行列式的值为0。&quot;] </span><br><span class="line"> 05 --&gt; 06</span><br><span class="line"> 03 --&gt; 07[&quot;性质7：把一行的倍数加到另一行上，行列式的值不变。&quot;]</span><br><span class="line"> 06 --&gt; 07</span><br></pre></td></tr></table></figure>
+<pre class="mermaid">graph TD
+ 00[行列式定义]--> 01["性质1：行列互换<br />，行列式的值不变"]
+ 00 --> 03["性质3：行列式中若是有某一行是两<br />组数的和，则此行列式等于两个行列<br />式的和，这两个行列式的这一行分别<br />是第一组数和第二组数，而其余各行<br />与原来行列式的相应各行相同。"]
+ 00 --> 02["性质2：行列式一行的<br />公因子可以提出去。"]
+ 00 --> 04["性质4：两行互换<br />，行列式反号。"]
+ 04 --> 05["性质5：两行相同<br />，行列式的值为0。"]
+ 02 --> 06["性质6：两行成比<br />例，行列式的值为0。"] 
+ 05 --> 06
+ 03 --> 07["性质7：把一行的倍数加到另一行上，行列式的值不变。"]
+ 06 --> 07</pre>
 <p>8、综上，如果<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>A</mi><mover><mo stretchy="true" minsize="3.0em">→</mo><mpadded width="+0.6em" lspace="0.3em"><mtext>初等行变换</mtext></mpadded></mover><mi>B</mi></mrow><annotation encoding="application/x-tex">A \xrightarrow{初等行变换}B</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.1113em;vertical-align:-0.011em;"></span><span class="mord mathnormal">A</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel x-arrow"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.1003em;"><span style="top:-3.322em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight x-arrow-pad"><span class="mord mtight"><span class="mord cjk_fallback mtight">初等行变换</span></span></span></span><span class="svg-align" style="top:-2.689em;"><span class="pstrut" style="height:2.7em;"></span><span class="hide-tail" style="height:0.522em;min-width:1.469em;"><svg xmlns="http://www.w3.org/2000/svg" width="400em" height="0.522em" viewBox="0 0 400000 522" preserveAspectRatio="xMaxYMin slice"><path d="M0 241v40h399891c-47.3 35.3-84 78-110 128
 -16.7 32-27.7 63.7-33 95 0 1.3-.2 2.7-.5 4-.3 1.3-.5 2.3-.5 3 0 7.3 6.7 11 20
  11 8 0 13.2-.8 15.5-2.5 2.3-1.7 4.2-5.5 5.5-11.5 2-13.3 5.7-27 11-41 14.7-44.7
