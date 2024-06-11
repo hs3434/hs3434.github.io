@@ -6316,47 +6316,6 @@ span.tagsPageCount {
   font-size: 0.6rem;
   margin-bottom: 0.5rem;
 }
-#about-page .author-content-item.game-apex {
-  min-height: 300px;
-  overflow: hidden;
-  color: var(--efu-white);
-  width: 59%;
-}
-#about-page .author-content-item.game-apex::after {
-  box-shadow: 0 -69px 203px 11px #04120f inset;
-  position: absolute;
-  content: '';
-  width: 100%;
-  height: 100%;
-  top: 0;
-  left: 0;
-}
-#about-page .author-content-item.game-apex .card-content {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  top: 0;
-  left: 0;
-  z-index: 2;
-  display: flex;
-  flex-direction: column;
-  padding: 1rem 2rem;
-}
-#about-page .author-content-item.game-jl {
-  width: 39%;
-  min-height: 300px;
-  overflow: hidden;
-  color: var(--efu-white);
-}
-#about-page .author-content-item.game-jl::after {
-  box-shadow: 0 -69px 203px 11px #415dc9 inset;
-  position: absolute;
-  content: '';
-  width: 100%;
-  height: 100%;
-  top: 0;
-  left: 0;
-}
 .author-content-item.personalities {
   overflow: hidden;
   position: relative;
