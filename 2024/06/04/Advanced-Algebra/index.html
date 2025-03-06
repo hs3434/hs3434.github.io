@@ -1,0 +1,1319 @@
+<!DOCTYPE html><html lang="en" data-theme="light"><head><meta charset="utf-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1"><title>高等代数（上）丘维声 笔记 | Blog of Shane Hu</title><noscript>Please enable JavaScript to view the site</noscript><link rel="icon" href="/img/pwa/favicon.ico"><!-- index.css--><link rel="stylesheet" href="/css/index.css?v=3.0.14"><!-- inject head--><link rel="canonical" href="https://hs3434.github.io/hs3434.github.io/2024/06/04/Advanced-Algebra/index.html"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"><!-- aplayer--><!-- swiper--><!-- fancybox ui--><!-- katex--><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.21/katex.min.css"><!-- Open Graph--><meta name="description" content="高等代数（上） 1 线性方程组的解法 1.1 解线性方程组的矩阵消元法 1、线性方程组：左端为未知量x的一次齐次式，右端是常数。关键词：系数、常数项、n元线性方程组、解集 2、线性方程组的初等变换：1）把一个方程的倍数加到另一个方程上；2）互换两个方程位置；3）用一个非零数乘其中一个方程 3、关键词"><!-- pwa--><meta name="apple-mobile-web-app-capable" content="Blog of Shane Hu"><meta name="theme-color" content="var(--efu-main)"><meta name="apple-mobile-web-app-status-bar-style" content="var(--efu-main)"><link rel="bookmark" href="/img/pwa/favicon.ico"><link rel="apple-touch-icon" href="/img/pwa/favicon.ico" sizes="180x180"><script>console.log(' %c Solitude %c ' + '3.0.14' + ' %c https://github.com/everfu/hexo-theme-solitude',
+    'background:#35495e ; padding: 1px; border-radius: 3px 0 0 3px;  color: #fff',
+    'background:#ff9a9a ; padding: 1px; border-radius: 0 3px 3px 0;  color: #fff',
+    'background:unset ; padding: 1px; border-radius: 0 3px 3px 0;  color: #fff')
+</script><script>(()=>{
+        const saveToLocal = {
+            set: function setWithExpiry(key, value, ttl) {
+                if (ttl === 0)
+                    return
+                const now = new Date()
+                const expiryDay = ttl * 86400000
+                const item = {
+                    value: value,
+                    expiry: now.getTime() + expiryDay
+                }
+                localStorage.setItem(key, JSON.stringify(item))
+            },
+            get: function getWithExpiry(key) {
+                const itemStr = localStorage.getItem(key)
+
+                if (!itemStr) {
+                    return undefined
+                }
+                const item = JSON.parse(itemStr)
+                const now = new Date()
+
+                if (now.getTime() > item.expiry) {
+                    localStorage.removeItem(key)
+                    return undefined
+                }
+                return item.value
+            }
+        };
+        window.utils = {
+            saveToLocal: saveToLocal,
+            getCSS: (url, id = false) => new Promise((resolve, reject) => {
+              const link = document.createElement('link')
+              link.rel = 'stylesheet'
+              link.href = url
+              if (id) link.id = id
+              link.onerror = reject
+              link.onload = link.onreadystatechange = function() {
+                const loadState = this.readyState
+                if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+                link.onload = link.onreadystatechange = null
+                resolve()
+              }
+              document.head.appendChild(link)
+            }),
+            getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+              const script = document.createElement('script')
+              script.src = url
+              script.async = true
+              script.onerror = reject
+              script.onload = script.onreadystatechange = function() {
+                const loadState = this.readyState
+                if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+                script.onload = script.onreadystatechange = null
+                resolve()
+              }
+
+              Object.keys(attr).forEach(key => {
+                script.setAttribute(key, attr[key])
+              })
+
+              document.head.appendChild(script)
+            }),
+            addGlobalFn: (key, fn, name = false, parent = window) => {
+                const globalFn = parent.globalFn || {}
+                const keyObj = globalFn[key] || {}
+
+                if (name && keyObj[name]) return
+
+                name = name || Object.keys(keyObj).length
+                keyObj[name] = fn
+                globalFn[key] = keyObj
+                parent.globalFn = globalFn
+            },
+            addEventListenerPjax: (ele, event, fn, option = false) => {
+              ele.addEventListener(event, fn, option)
+              utils.addGlobalFn('pjax', () => {
+                  ele.removeEventListener(event, fn, option)
+              })
+          },
+        }
+    })()</script><!-- theme--><script>initTheme = () => {
+    let isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches
+    const cachedMode = utils.saveToLocal.get('theme');
+    if (cachedMode === undefined) {
+        const nowMode =
+            isDarkMode ? 'dark' : 'light'
+        document.documentElement.setAttribute('data-theme', nowMode);
+    } else {
+        document.documentElement.setAttribute('data-theme', cachedMode);
+    }
+    typeof rm === 'object' && rm.mode(cachedMode === 'dark' && isDarkMode)
+}
+initTheme()</script><!-- global head--><script>const GLOBAL_CONFIG = {
+    root: '/',
+    algolia: undefined,
+    localsearch: undefined,
+    runtime: '2024-06-03 00:00:00',
+    lazyload: {
+        enable: true,
+        error: '/img/error_load.webp'
+    },
+    copyright: {"limit":50,"author":"Author: Shane Hu","link":"Link: ","source":"Source: Blog of Shane Hu","info":"Copyright is owned by the author. For commercial reprints, please contact the author for authorization. For non-commercial reprints, please indicate the source."},
+    highlight: {"limit":200,"expand":true,"copy":true,"syntax":"highlight.js"},
+    randomlink: false,
+    lang: {"theme":{"dark":"Dark","light":"Light"},"copy":{"success":"Copied","error":"Copy failed"},"backtop":"Back to top","time":{"day":" days ago","hour":" hours ago","just":"just","min":" minutes ago","month":" months ago"},"day":" days","f12":"Developer mode is turned on, please follow the GPL.","totalk":"You don't need to delete blank lines, just type in your comments."},
+    aside: {
+        state: {
+            morning: "✨ 早上好，新的一天开始了",
+            noon: "🍲 午餐时间",
+            afternoon: "🌞 下午好",
+            night: "早点休息",
+            goodnight: "晚安 😴",
+        },
+        witty_words: [],
+        witty_comment: {
+            prefix: 'Long time no see, ',
+            back: 'Welcome back again,',
+        },
+    },
+    covercolor: {
+        enable: false
+    },
+    comment: false,
+    lightbox: 'null',
+    right_menu: false,
+    translate: {"translateDelay":0,"defaultEncoding":2},
+    lure: false,
+    expire: false,
+};</script><!-- page-config head--><script id="config-diff">var PAGE_CONFIG = {
+    is_post: true,
+    is_page: false,
+    is_home: false,
+    page: '',
+    toc: true,
+    comment: false,
+    ai_text: false,
+    color: false,
+}</script><meta name="generator" content="Hexo 7.3.0"></head><body id="body"><!-- universe--><canvas id="universe"></canvas><!-- background img--><!-- loading--><!-- console--><!-- sidebar--><div id="sidebar" style="zoom: 1;"><div id="menu-mask" style="display: none;"></div><div id="sidebar-menus"><div class="site-data"><div class="data-item is-center"><div class="data-item-link"><a href="/archives/"><div class="headline">Archives</div><div class="length-num">18</div></a></div></div><div class="data-item is-center"><div class="data-item-link"><a href="/categories/"><div class="headline">Categories</div><div class="length-num">7</div></a></div></div><div class="data-item is-center"><div class="data-item-link"><a href="/tags/"><div class="headline">Tags</div><div class="length-num">27</div></a></div></div></div><span class="sidebar-menu-item-title">Function</span><div class="sidebar-menu-item"><span class="darkmode_switchbutton menu-child" onclick="sco.switchDarkMode()"><i class="solitude fas fa-circle-half-stroke"></i><span>Display mode</span></span></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="javascript:void(0);"><span>文库</span></a><ul class="menus_item_child"><li><a class="site-page child" href="/archives/"><i class="solitude  st-folder-fill"></i><span>文章列表</span></a></li><li><a class="site-page child" href="/categories/"><i class="solitude  st-checkbox-multiple-blank-fill"></i><span>全部分类</span></a></li><li><a class="site-page child" href="/tags/"><i class="solitude  st-price-tag-fill"></i><span>全部标签</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="javascript:void(0);"><span>关于我</span></a><ul class="menus_item_child"><li><a class="site-page child" href="/about/"><i class="solitude  st-contacts-fill"></i><span>自我介绍</span></a></li></ul></div></div><span class="sidebar-menu-item-title">Tags</span><div class="card-tags"><div class="card-tag-cloud"><a href="/tags/debian/">debian<sup>1</sup></a><a href="/tags/dns/">dns<sup>2</sup></a><a href="/tags/53port/">53port<sup>1</sup></a><a href="/tags/web/">web<sup>1</sup></a><a href="/tags/http/">http<sup>1</sup></a><a href="/tags/vscode-python-conda/">vscode python conda<sup>1</sup></a><a href="/tags/socks5/">socks5<sup>1</sup></a><a href="/tags/Dante/">Dante<sup>1</sup></a><a href="/tags/conda/">conda<sup>1</sup></a><a href="/tags/bind9/">bind9<sup>1</sup></a><a href="/tags/algebra/">algebra<sup>1</sup></a><a href="/tags/mathematics/">mathematics<sup>1</sup></a><a href="/tags/Fonts/">Fonts<sup>1</sup></a><a href="/tags/hexo/">hexo<sup>2</sup></a><a href="/tags/OpenWRT/">OpenWRT<sup>1</sup></a><a href="/tags/server/">server<sup>1</sup></a><a href="/tags/vps/">vps<sup>1</sup></a><a href="/tags/theme/">theme<sup>1</sup></a><a href="/tags/ssl/">ssl<sup>1</sup></a><a href="/tags/AI/">AI<sup>1</sup></a><a href="/tags/jottings/">jottings<sup>2</sup></a><a href="/tags/python/">python<sup>2</sup></a><a href="/tags/mysql/">mysql<sup>2</sup></a><a href="/tags/api/">api<sup>2</sup></a><a href="/tags/udesk/">udesk<sup>2</sup></a><a href="/tags/ydns/">ydns<sup>1</sup></a><a href="/tags/ddns/">ddns<sup>1</sup></a></div></div></div></div><!-- keyboard--><!-- righhtside--><div class="post" id="body-wrap"><header class="post-bg" id="page-header"><nav class="show" id="nav"><div id="nav-group"><div id="blog_name"><a id="site-name" href="/" title="Back to home"><span class="title">主页</span><i class="solitude fas fa-home"></i></a></div><div id="page-name-mask"><div id="page-name"><a id="page-name-text" onclick="sco.toTop()">高等代数（上）丘维声 笔记</a></div></div><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="javascript:void(0);"><span>文库</span></a><ul class="menus_item_child"><li><a class="site-page child" href="/archives/"><i class="solitude  st-folder-fill"></i><span>文章列表</span></a></li><li><a class="site-page child" href="/categories/"><i class="solitude  st-checkbox-multiple-blank-fill"></i><span>全部分类</span></a></li><li><a class="site-page child" href="/tags/"><i class="solitude  st-price-tag-fill"></i><span>全部标签</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="javascript:void(0);"><span>关于我</span></a><ul class="menus_item_child"><li><a class="site-page child" href="/about/"><i class="solitude  st-contacts-fill"></i><span>自我介绍</span></a></li></ul></div></div></div><div id="nav-left"></div><div id="nav-right"><div class="nav-button" id="nav-totop" onclick="sco.toTop()"><a class="totopbtn"><i class="solitude fas fa-arrow-up"></i><span id="percent">0</span></a></div><div id="toggle-menu"><a class="site-page"><i class="solitude fas fa-bars"></i></a></div></div></div></nav><div class="coverdiv" id="coverdiv"><img class="nolazyload" id="post-cover" src="/2024/06/04/Advanced-Algebra/image.png" alt="高等代数（上）丘维声 笔记"></div><div id="post-info"><div id="post-firstinfo"><div class="meta-firstline"><a class="post-meta-original" title="This article is a Original article, pay attention to the copyright.">Original</a><span class="post-meta-categories"><a class="post-meta-categories" href="/categories/mathematics/">mathematics</a></span><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/algebra/"><span class="tags-name tags-punctuation"><i class="solitude fas fa-hashtag"></i>algebra</span></a><a class="post-meta__tags" href="/tags/mathematics/"><span class="tags-name tags-punctuation"><i class="solitude fas fa-hashtag"></i>mathematics</span></a></div></div></div></div><h1 class="post-title">高等代数（上）丘维声 笔记</h1><div id="post-meta"><div class="meta-secondline"><span class="post-meta-date" title="Posted on 2024-06-04 18:47:13"><i class="post-meta-icon solitude fas fa-calendar-days"></i><time datetime="2024-06-04T10:47:13.000Z">2024-06-04T10:47:13.000Z</time></span><span class="post-meta-date" title="Last updated on 2024-06-06 14:23:27"><i class="post-meta-icon solitude fas fa-arrows-rotate"></i><time datetime="2024-06-06T06:23:27.000Z">2024-06-06T06:23:27.000Z</time></span></div></div></div><div id="post-info-bottom"></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content article-container"><h1>高等代数（上）</h1>
+<h2 id="1-线性方程组的解法">1 线性方程组的解法</h2>
+<h3 id="1-1-解线性方程组的矩阵消元法">1.1 解线性方程组的矩阵消元法</h3>
+<p>1、线性方程组：左端为未知量x的一次齐次式，右端是常数。关键词：系数、常数项、n元线性方程组、解集</p>
+<p>2、线性方程组的初等变换：1）把一个方程的倍数加到另一个方程上；2）互换两个方程位置；3）用一个非零数乘其中一个方程</p>
+<p>3、关键词：阶梯型方程组、简化阶梯型方程组、增广矩阵、系数矩阵、零矩阵、方阵、m级矩阵（方阵）、矩阵的初等变换</p>
+<p>4、阶梯型矩阵：1）零行在下方（如果有零行的话）；2）非零行从左边起第一个不为0的元素（称为主元），它们的列指标随行指标的递增而严格增大。</p>
+<p>5、简化行阶梯形矩阵：1）是阶梯型矩阵；2）非零行的主元为1；3）主元所在列的其余元素为0。</p>
+<p>6、定理1：任意一个矩阵都可以经过一系类初等行变换化成阶梯形矩阵。<br>
+证明：</p>
+<p>7、推论1：任意一个矩阵都可以经过一系类初等行变换化成简化阶梯形矩</p>
+<p>8、线性方程组的一般解：以主元为系数的未知量称为主变量，其余未知量为自由未知量，一般解就是用含自由未知量的式子表示主变量。</p>
+<h3 id="1-2线性方程组的解的情况及其判别准则">1.2线性方程组的解的情况及其判别准则</h3>
+<p>1、定理1：系数为有理数（或实数、复数）的你元线性方程组的解的情况只有三种可能：1）无解、2）有唯一解、3）有无穷多个解。</p>
+<p><strong>高斯-约当</strong>算法：</p>
+<pre class="mermaid">graph TD
+01["线性方程组的增广矩阵"]-->| 初等行变换|02["阶梯形矩阵"]
+02-->03{"是否出现“0=d?”"}
+03-->|是|04["原方程无解"]
+03-->|否 初等行变换|05["简化行阶梯形矩阵"]
+05-->06{"非零行数目=未知量数目？"}
+06-->|是|07["原方程有唯一解"]
+06-->|否 初等行变换|08["有无穷多个解"]</pre>
+<p>如果一个线性方程组有解，那么称它是相容的；否则，称它是不相容的。关键词：齐次线性方程组、零解、非零解</p>
+<p>2、推论1：n元齐次线性方程组有非零解的充分必要是：它的系数矩阵经过初等行变换化成的阶梯形矩阵中，非零行的数目r&lt;n。</p>
+<p>3、推论2：n元齐次线性方程组如果方程的数目s小于未知量的数目n，那么它一定有非零解。</p>
+<h3 id="1-3-数域">1.3 数域</h3>
+<p>1、定义：复数集的一个子集K如果满足：<br>
+（1） 0，1∈K；<br>
+（2） a，b∈K→a±b，ab∈K，<br>
+a，b∈K，且b≠0→a/b∈K<br>
+那么，称K是一个数域。</p>
+<p>2、有理数集Q，实数集R，复数集C都是数域；但整数集Z不是数域，因为Z对于除法不封闭。任何数域都含有有理数域，有理数域是最小的数域，复数域是最大的数域。</p>
+<p>3、命题1：任一数域都包含有理数域。</p>
+<h2 id="2-行列式">2 行列式</h2>
+<h3 id="2-1-n元排列">2.1 n元排列</h3>
+<p>1、n个不同的自然数的一个全排列称为一个n元排列。</p>
+<p>2、顺序、逆序、逆序数：τ(abcd…)（读音：tao）、奇排列、偶排列、对换(a,b)</p>
+<p>3、定理1：对换改变n元排列的奇偶性。</p>
+<p>4、定理2：任一n元排列与顺序排列123……n可以经过一系类对换互变，且所做对换次数与这个n元排列有相同的奇偶性。</p>
+<h3 id="2-2-n阶行列式的定义">2.2 n阶行列式的定义</h3>
+<p>1、定义1：n阶行列式是n！项的代数和，其中每一项都是位于不同行、不同列的n个元素的乘积，把这n个元素以行指标为自然序号排好位置，当列指标构成的排列是偶排列时，该项带正号；是奇排列时，该项带负号。即：</p>
+<p>\tag{1}
+\begin{vmatrix}
+   a_{11} & a_{12} & ... & a_{1n} \\
+   a_{21} & a_{22} & ... & a_{2n} \\
+   \vdots & \vdots & & \vdots \\
+   a_{n1} & a_{n2} & ... & a_{nn}
+\end{vmatrix}=
+\sum_{j_1j_2...j_n}(-1)^{\tau(j_1j_2...j_n)} a_{1j_1}a_{2j_2}...a_{3j_3}
+</p>
+<p>其中，j_1j_2...j_n是n元排列， \sum表示对所有的n元排列求和。(1)式称为n阶行列式的<strong>完全展开式</strong>。</p>
+<p>令</p>
+<p>A=\tag{2}
+\begin{bmatrix}
+   a_{11} & a_{12} & ... & a_{1n} \\
+   a_{21} & a_{22} & ... & a_{2n} \\
+   \vdots & \vdots & & \vdots \\
+   a_{n1} & a_{n2} & ... & a_{nn}
+\end{bmatrix}
+</p>
+<p>则n阶行列式(1)也称为n级矩阵A的行列式，简记作|A|或者det A。</p>
+<p>2、命题1：n阶上三角行列式的值等于它的主对角线上n个元素的乘积。</p>
+<h3 id="2-3-行列式的性质">2.3 行列式的性质</h3>
+<p>1、性质1：行列互换，行列式的值不变。推论：行列式的行与列的<strong>地位是对称的</strong>。因此，行列式有关行的性质，对于列也同样成立。</p>
+<p>2、性质2：行列式一行的公因子可以提出去。推论：如果行列式中有一行的元素全为0，那么行列式的值为0。</p>
+<p>\tag{1}
+\begin{vmatrix}
+   a_{11} & a_{12} & ... & a_{1n} \\
+   \vdots & \vdots & &\vdots \\
+   ka_{i1} & ka_{i2} & ... & ka_{in} \\
+   \vdots & \vdots & & \vdots \\
+   a_{n1} & a_{n2} & ... & a_{nn}
+\end{vmatrix}=
+k\begin{vmatrix}
+   a_{11} & a_{12} & ... & a_{1n} \\
+   \vdots & \vdots & &\vdots \\
+   a_{i1} & a_{i2} & ... & a_{in} \\
+   \vdots & \vdots & & \vdots \\
+   a_{n1} & a_{n2} & ... & a_{nn}
+\end{vmatrix}
+</p>
+<p>3、性质3：行列式中若是有某一行是两组数的和，则此行列式等于两个行列式的和，这两个行列式的这一行分别是第一组数和第二组数，而其余各行与原来行列式的相应各行相同。即：</p>
+<p>\begin{vmatrix}
+   a_{11} & a_{12} & ... & a_{1n} \\
+   \vdots & \vdots & &\vdots \\
+   b_1+c_1 & b_2+c_2& ... & b_n+c_n \\
+   \vdots & \vdots & & \vdots \\
+   a_{n1} & a_{n2} & ... & a_{nn}
+\end{vmatrix}(第i行)=
+\begin{vmatrix}
+   a_{11} & a_{12} & ... & a_{1n} \\
+   \vdots & \vdots & &\vdots \\
+   b_1 & b_2 & ... & b_n \\
+   \vdots & \vdots & & \vdots \\
+   a_{n1} & a_{n2} & ... & a_{nn}
+\end{vmatrix}+
+\begin{vmatrix}
+   a_{11} & a_{12} & ... & a_{1n} \\
+   \vdots & \vdots & &\vdots \\
+   c_1 & c_2 & ... & c_n \\
+   \vdots & \vdots & & \vdots \\
+   a_{n1} & a_{n2} & ... & a_{nn}
+\end{vmatrix} \tag{2}
+</p>
+<p>4、性质4：两行互换，行列式反号。</p>
+<p>5、性质5：两行相同，行列式的值为0。</p>
+<p>6、性质6：两行成比例，行列式的值为0。</p>
+<p>7、性质7：把一行的倍数加到另一行上，行列式的值不变。</p>
+<pre class="mermaid">graph TD
+ 00[行列式定义]--> 01["性质1：行列互换<br />，行列式的值不变"]
+ 00 --> 03["性质3：行列式中若是有某一行是两<br />组数的和，则此行列式等于两个行列<br />式的和，这两个行列式的这一行分别<br />是第一组数和第二组数，而其余各行<br />与原来行列式的相应各行相同。"]
+ 00 --> 02["性质2：行列式一行的<br />公因子可以提出去。"]
+ 00 --> 04["性质4：两行互换<br />，行列式反号。"]
+ 04 --> 05["性质5：两行相同<br />，行列式的值为0。"]
+ 02 --> 06["性质6：两行成比<br />例，行列式的值为0。"] 
+ 05 --> 06
+ 03 --> 07["性质7：把一行的倍数加到另一行上，行列式的值不变。"]
+ 06 --> 07</pre>
+<p>8、综上，如果A \xrightarrow{初等行变换}B，那么|B|=l|A|，其中l是个非零数。</p>
+<h3 id="2-4-行列式按一行（列）展开">2.4 行列式按一行（列）展开</h3>
+<p>1、定义1：n阶行列式|A|中，划去第i行和，第j列，剩下的元素按原来次序组成的n-1阶行列式称为矩阵A的(i,j)元的<strong>余子式</strong>，记作M_{ij}。令</p>
+<p>\tag{1}A_{ij}=(-1)^{i+j}M_{ij}
+</p>
+<p>称A_{ij}是A的(i,j)元的<strong>代数余子式</strong>。</p>
+<p>2、定理1：n阶行列式|A|等于它的第i行元素与自己的代数余子式的乘积之和，即</p>
+<p>\tag{2}|A|=a_{i1}A_{i1}+a_{i2}A_{i2}+\dots+a_{im}A_{im}=\sum_{j=1}^na_{ij}A_{ij}
+</p>
+<p>其中i\in\{1,2\dots n\}，(2)式称为n阶行列式按第i行的展开式。</p>
+<p>3、定理2：n阶行列式|A|等于它的第j列元素与自己的代数余子式的乘积之和，即</p>
+<p>|A|=a_{1j}A_{1j}+a_{2j}A_{2j}+\dots+a_{nj}A_{nj}=\sum_{l=1}^na_{lj}A_{lj} \tag{3}
+</p>
+<p>4、定理3：n阶行列式|A|的第i行元素与第k行(k\neq i)的相应元素的代数余子式的乘积之和等于0，即</p>
+<p>a_{i1}A_{k1}+a_{i2}A_{k2}+\dots +a_{in}A_{kn}=0,当\space k \neq i \tag{4}
+</p>
+<p>5、定理4：n阶行列式|A|的第j列元素与第l列(l\neq j)的相应元素的代数余子式的乘积之和等于0，即</p>
+<p>a_{1j}A_{1l}+a_{2j}A_{2l}+\dots +a_{nj}A_{nl}=0,当\space l \neq j \tag{5}
+</p>
+<p>6、小结</p>
+<p>\sum_{j=1}^na_{ij}A_{kj}=\begin{cases}
+   |A|, & 当k=i， \\
+   0, & 当k \neq i;
+\end{cases}\tag{6}
+</p>
+<p>\sum_{i=1}^na_{ij}A_{il}=\begin{cases}
+   |A|, & 当l=j， \\
+   0, & 当l \neq j.
+\end{cases}\tag{7}
+</p>
+<p>7、<strong>范德蒙(Vandermonde)行列式</strong></p>
+<p>\begin{vmatrix}
+	1 & 1 & 1 & \dots & 1 \\
+   a_1 & a_2 & a_3 & ... & a_n \\
+   a_1^2 & a_2^2 & a_3^2 & ... & a_n^2 \\
+   \vdots & \vdots & \vdots & & \vdots \\
+   a_1^{n-2} & a_2^{n-2} & a_3^{n-2} & ... & a_n^{n-2} \\
+   a_1^{n-1} & a_2^{n-1} & a_3^{n-1} & ... & a_n^{n-1} \\
+\end{vmatrix}=
+\prod_{1\leqslant j < i\leqslant n}(a_i-a_j) \tag{8}
+</p>
+<h3 id="2-5-克莱姆-Cramer-法则">2.5 克莱姆(Cramer)法则</h3>
+<p>1、定理1：数域K上n个方程的n元线性方程组有唯一解的充分必要条件是它的系数行列式（即系数矩阵A的行列式|A|）不等于0。</p>
+<p>推论1：数域K上n个方程的n元齐次线性方程组只有零解的充分必要条件是它的系数行列式不等于0。从而它有非零解的充分必要条件是它的系数行列式等于0。</p>
+<p>2、定理2：n个方程的n元线性方程组(1)的系数行列式|A|\neq 0时，它的唯一解是</p>
+<p>(\frac {|B_1|} {|A|},\frac {|B_2|} {|A|},\dots,\frac {|B_n|} {|A|}). \tag{1}
+</p>
+<h3 id="2-6-行列式按k行（列）展开">2.6 行列式按k行（列）展开</h3>
+<p>1、定义1：n阶行列式|A|中任意取定k行，k列1 \leqslant k < n，位于这些行和列的交叉处的k^2个元素按原来的排法组成的k阶行列式，称为|A|的一个<strong>k阶子式</strong>。</p>
+<p>取定|A|的第i_1,i_2,\dots,i_k行(i_1<i_2<\dots<i_k)，第j_1,j_2,\dots,j_k列(j_1<j_2<\dots<j_k)，所得到的k阶子式记作</p>
+<p>A\begin{pmatrix}
+  i_1,i_2,\dots,i_k \\
+  j_1,j_2,\dots,j_k
+\end{pmatrix} \tag{1}
+</p>
+<p>划去这个k阶子式所在的行和列，剩下的元素按原来的排法组成的(n-k)阶行列式，称为子式(1)的<strong>余子式</strong>，它前面乘以</p>
+<p>(-1)^{(i_1+i_2+\dots+i_k)+(j_1+j_2+\dots+j-k)},
+</p>
+<p>则称为子式(1)的<strong>代数余子式</strong>。令</p>
+<p>\begin{align}
+\{i_1^`,i_2^`,\dots,i_{n-k}^`\}&=\{1,2,\dots,n\}\backslash\{i_1,i_2,\dots,i_k\},\\
+\{j_1^`,j_2^`,\dots,j_{n-k}^`\}&=\{1,2,\dots,n\}\backslash\{j_1,j_2,\dots,j_k\},
+\end{align}
+</p>
+<p>并且i_1^`<i_2^`<\dots<i_{n-k}^`,j_1^`<j_2^`<\dots<j_{n-k}^`，则子式(1)的余子式为</p>
+<p>A\begin{pmatrix}
+  i_1^`,i_2^`,\dots,i_{n-k}^` \\
+  j_1^`,j_2^`,\dots,j_{n-k}^`
+\end{pmatrix} \tag{2}
+</p>
+<p>2、定理1：<strong>拉普拉斯(Laplace)定理</strong>（或行列式按k行展开定理），在n阶行列式|A|中，取定第i_1,i_2,\dots,i_k行(i_1<i_2<\dots<i_k)，则这k行元素形成的所有k阶子式与它们自己的代数余子式的乘积之和等于|A|，即</p>
+<p>|A|=\sum_{1\leqslant j_1<j_2<\dots<j_k}
+A\begin{pmatrix}
+  i_1,i_2,\dots,i_k \\
+  j_1,j_2,\dots,j_k
+\end{pmatrix}
+(-1)^{(i_1+i_2+\dots+i_k)+(j_1+j_2+\dots+j-k)}
+A\begin{pmatrix}
+  i_1^`,i_2^`,\dots,i_{n-k}^` \\
+  j_1^`,j_2^`,\dots,j_{n-k}^`
+\end{pmatrix}. \tag{3}
+</p>
+<p>推论1：</p>
+<p>\begin{vmatrix}
+	A & 0 \\
+	C & B
+\end{vmatrix}=|A|*|B|. \tag{4}
+</p>
+<h2 id="3-线性方程组的解集的结构">3 线性方程组的解集的结构</h2>
+<h3 id="3-1-n维向量空间K-n">3.1 n维向量空间K^n</h3>
+<p>1、定义1：数域K上所有n元有序数组组成的集合K^{n},连同定义在它上面的加法运算和数量乘法运算，以及满足的8条运算法则一起，称为数域K上的一个<strong>n维向量空间</strong>。K^{n}的元素称为<strong>n维向量</strong>；设向量\alpha =(a_1,a_2,\dots,a_n)，称a_i是\alpha的第i个<strong>分量</strong>。</p>
+<p>取定一个数域K，设n是任意给定的一个正整数。令</p>
+<p>K^n=\{(a_1,a_2,\dots,a_n)\space|\space a_i \in K,i=1,2,\dots,n\}.
+</p>
+<p>如果a_1=b_1,a_2=b_2,\dots,a_n=b_n，则称K^ n中两个元素(a_1,a_2,\dots,a_n)与(b_1,b_2,\dots,b_n)相等。</p>
+<p>在K^{n}中规定加法运算如下：</p>
+<p>(a_1,a_2,\dots,a_n)+(b_1,b_2,\dots,b_n)\xlongequal{\text{def}}(a_1+b_1,a_2+b_2,\dots,a_n+b_n)
+</p>
+<p>在K的元素与K^{n}的元素之间规定数量乘法运算如下：</p>
+<p>k(a_1,a_2,\dots,a_n) \xlongequal{\text{def}} (ka_1,ka_2,\dots,ka_n)
+</p>
+<p>容易直接验证加法和数量乘法满足下述8条运算法则：对于\alpha ,\beta ,\gamma \in K^n ;\space k,l \in K  有</p>
+<p>(1)\alpha + \beta = \beta + \alpha；</p>
+<p>(2)(\alpha +\beta)+\gamma=\alpha +(\beta +\gamma)；</p>
+<p>(3)把元素(0,0,\dots,0)记作<strong>0</strong>，它使得</p>
+<p>\bold 0+\alpha=\alpha+\bold 0=\alpha,
+</p>
+<p>称<strong>0</strong>是K^n的<strong>零元素</strong>；</p>
+<p>(4)对于\alpha=(a_1,a_2,\dots,a_n)\in K^n，令</p>
+<p>-\alpha \xlongequal{\text{def}} (-a_1,-a_2,\dots,-a_n) \in K^n,
+</p>
+<p>有</p>
+<p>\alpha+(-\alpha)=(-\alpha)+\alpha=\bold 0,
+</p>
+<p>称-\alpha是\alpha的<strong>负元素</strong>；</p>
+<p>(5)1\alpha=\alpha;</p>
+<p>(6)(kl)\alpha=k(l\alpha);</p>
+<p>(7)(k+l)\alpha=k\alpha+l\alpha;</p>
+<p>(8)k(\alpha+\beta)=k\alpha+k\beta.</p>
+<p>2、补充：</p>
+<p>(1)通常用小写字母\alpha ,\beta ,\gamma表示向量。</p>
+<p>(2)在n维向量空间K^n中，可以定义减法运算如下：</p>
+<p>\alpha -\beta \xlongequal{\text{def}} \alpha +(-\beta).
+</p>
+<p>(3)在n维向量空间K^n中，容易直接验证下述4条性质：</p>
+<p>\begin{aligned}
+0\alpha=\bold 0,&  \qquad \forall \alpha \in K^n; \\
+(-1)\alpha=-\alpha,&  \qquad \forall \alpha \in K^n; \\
+k\bold 0=\bold 0,&  \qquad \forall k \in K; \\
+k\alpha=\bold 0 \implies & k=0 \, 或 \, \alpha=\bold 0
+\end{aligned}
+</p>
+<p>(4)n元有序数组写成一行，称为<strong>行向量</strong>；写成一列，称为<strong>列向量</strong>。K^n既是n维行向量组成的向量空间，也是n维列向量组成的向量空间。</p>
+<p>(5)在K^n中，给定向量组\alpha_1,\alpha_2,\dots,\alpha_s，对于\beta \in K^n，如果存在K中一组数c_1,c_2,\dots,c_s使得</p>
+<p>\beta=c_1\alpha_1+c_2\alpha_2+\dots+c_s\alpha_s,
+</p>
+<p>那么称\beta可以由\alpha_1,\alpha_2,\dots,\alpha_s<strong>线性表出（示）</strong>。\beta是向量组\alpha_1,\alpha_2,\dots,\alpha_s的一个<strong>线性组合</strong>，其中c_1,c_2,\dots,c_s称为<strong>系数</strong>。</p>
+<p>3、定义2：K^n的一个非空子集U如果满足：</p>
+<p>\begin{aligned}
+(1) \quad & \alpha,\gamma \in U \implies \alpha +\gamma \in U, \\
+(2) \quad & \alpha \in U,k\in K \implies k\alpha \in U,
+\end{aligned}
+</p>
+<p>那么称U是K^n的一个<strong>线性子空间</strong>，简称<strong>子空间</strong>。其中性质（1）称为U对于K^n的<strong>加法封闭</strong>；性质（2）称为U对于K^n的<strong>数量乘法封闭</strong>。</p>
+<p>(1) {<strong>0</strong>}是K^n的一个子空间，称为<strong>零子空间</strong>。K^n本身也是K^n的一个子空间。</p>
+<p>(2) 从而，K^n中，向量组\alpha_1,\alpha_2,\dots,\alpha_s的所有线性组合组成的集合W是K^n的一个子空间，称它为\alpha_1,\alpha_2,\dots,\alpha_s<strong>生成（或张成）的子空间</strong>，记作</p>
+<p><\alpha_1,\alpha_2,\dots,\alpha_s>
+</p>
+<p>(3) 命题1：数域K上n元线性方程组x_1\alpha_1+x_2\alpha_2+\dots+x_n\alpha_n=\beta有解</p>
+<p>\begin{aligned}
+\iff & \beta \, 可以由\, \alpha_1,\alpha_2,\dots,\alpha_n \,线性表出 \\
+\iff & \beta \in <\alpha_1,\alpha_2,\dots,\alpha_n>
+\end{aligned}
+</p>
+<h3 id="3-2-线性相关与线性无关的向量组">3.2 线性相关与线性无关的向量组</h3>
+<p>1、定义1：K^n中向量组\alpha_1,\alpha_2,\dots,\alpha_s(s\geqslant 1)称为是<strong>线性相关</strong>的，如果有K中不全为0的数k_1,k_2,\dots,k_s，使得</p>
+<p>k_1\alpha_1+\dots+k_s\alpha_s=\bold 0
+</p>
+<p>2、定义2：K^n中向量组\alpha_1,\alpha_2,\dots,\alpha_s(s\geqslant 1)如果不是线性相关的，那么称为<strong>线性无关</strong>的。</p>
+<p>3、从定义1和定义2显得：</p>
+<p>（1）包含零向量的向量组一定线性相关(k\bold 0+\alpha_2+\dots+0\alpha_s=\bold 0);</p>
+<p>（2）单个向量\alpha线性相关当且仅当\alpha=\bold 0(因为k\alpha=0,k\not=0 \iff\alpha=\bold 0);</p>
+<p>从而单个向量\alpha线性无关当且仅当\alpha \not= \bold 0;</p>
+<p>（3）K^n中，向量组</p>
+<p>\varepsilon_1=\begin{bmatrix} 1 \\0\\0\\ \vdots \\0\\0\end{bmatrix},
+\varepsilon_2=\begin{bmatrix} 0 \\1\\0\\ \vdots \\0\\0\end{bmatrix},\dots,
+\varepsilon_n=\begin{bmatrix} 0 \\0\\0\\ \vdots \\0\\1\end{bmatrix},
+</p>
+<p>是线性无关的。</p>
+<p>4、向量组线性相关与线性无关区别：</p>
+<p>（1）从线性组合看：</p>
+<p>\begin{aligned}
+&向量组\alpha_1,\dots,\alpha_s(s\geqslant1)线性相关 \\
+\iff&它们有系数不全为0的线性组合等于零向量；\\ \\
+&向量组\alpha_1,\dots,\alpha_s(s\geqslant 1)线性无关 \\
+\iff&它们只有系数全为0的线性组合才会等于零向量。
+\end{aligned}
+</p>
+<p>（2）从线性表出看：</p>
+<p>\begin{aligned}
+&向量组\alpha_1,\dots,\alpha_s(s\geqslant 2)线性相关 \\
+\iff&其中至少有一个向量可以由其余向量线性表出；\\ \\
+&向量组\alpha_1,\dots,\alpha_s(s\geqslant 2)线性无关 \\
+\iff&其中每一个向量都不能由其余向量线性表出。
+\end{aligned}
+</p>
+<p>（3）从齐次线性方程组看：</p>
+<p>\begin{aligned}
+&列向量组\alpha_1,\dots,\alpha_s(s\geqslant 1)线性相关 \\
+\iff&齐次线性方程组x_1\alpha_1+\dots+x_s\alpha_s=\bold 0有非零解；\\ \\
+&列向量组\alpha_1,\dots,\alpha_s(s\geqslant 1)线性无关 \\
+\iff&齐次线性方程组x_1\alpha_1+\dots+x_s\alpha_s=\bold 0只有零解。
+\end{aligned}
+</p>
+<p>（4）从行列式看：</p>
+<p>\begin{aligned}
+&n个n维列（行）向量\alpha_1,\dots,\alpha_n(s\geqslant 1)线性相关 \\
+\iff&以\alpha_1,\dots,\alpha_n为列（行）向量组的矩阵的行列式等于零；\\ \\
+&n个n维列（行）向量\alpha_1,\dots,\alpha_n(s\geqslant 1)线性无关 \\
+\iff&以\alpha_1,\dots,\alpha_n为列（行）向量组的矩阵的行列式不等于零。
+\end{aligned}
+</p>
+<p>（5）从向量组线性表出一个向量的方式看：</p>
+<p>\begin{aligned}
+设向量\beta 可以由向量组\alpha_1,\dots,\alpha_s线性表出，则 \\
+向量组\alpha_1,\dots,\alpha_s线性无关
+\iff&表出方式唯一；\\ 
+向量组\alpha_1,\dots,\alpha_s线性相关 
+\iff&表出方式有无穷多种。
+\end{aligned}
+</p>
+<p>（6）从向量组与它的部分组的关系看：</p>
+<p>\begin{aligned}
+&如果向量组的一个部分组线性相关，那么整个向量组也线性相关。 \\
+&如果向量组线性无关，那么它的任何一个部分组也线性无关。
+\end{aligned}
+</p>
+<p>（7）从向量组与它的延伸组或缩短组的关系看：</p>
+<p>\begin{aligned}
+&如果向量组线性无关，那么把每个向量添上m个分量（所添分量位置对于每个向量都一样）得到的延伸组也线性无关。 \\
+&如果向量组线性相关，那么把每个向量去掉m个分量（去掉的分量位置对于每个向量都一样）得到的缩短组也线性相关。
+\end{aligned}
+</p>
+<p>5、命题1：设向量组\alpha_1,\dots,\alpha_s线性无关，则向量\beta可以由\alpha_1,\dots,\alpha_s线性表出的充分必要条件是\alpha_1,\dots,\alpha_s,\beta线性相关。</p>
+<p>推论1：设向量组\alpha_1,\dots,\alpha_s线性无关，则向量\beta不能由\alpha_1,\dots,\alpha_s线性表出的充分必要条件是\alpha_1,\dots,\alpha_s,\beta线性无关。</p>
+<p>6、替换定理：设向量组\alpha_1,\dots,\alpha_s线性无关，\beta=b_1\alpha_1,\dots,b_s\alpha_s。如果b_i\not=0，那么用\beta替换\alpha_i后得到的向量组\alpha_1,\dots,\alpha_{i-1},\beta,\alpha_{i+1},\dots,\alpha_s也线性无关。</p>
+<h3 id="3-3-向量组的秩">3.3 向量组的秩</h3>
+<p>1、定义1：向量组的一个部分组称为一个<strong>极大线性无关组</strong>，如果这个部分组本身是线性无关的，但是从这个向量组的其余向量（如果还有的话）中任取一个添进去，得到的新的部分组都线性相关。</p>
+<p>2、定义2：如果向量组\alpha_1,\dots,\alpha_s的每一个向量都可以由向量组\beta_1,\dots,\beta_r线性表出，那么称向量组\alpha_1,\dots,\alpha_s可以由向量组\beta_1,\dots,\beta_r线性表出。如果向量组\alpha_1,\dots,\alpha_s与向量组\beta_1,\dots,\beta_r可以相互线性表出，那么称向量组\alpha_1,\dots,\alpha_s与向量组\beta_1,\dots,\beta_r<strong>等价</strong>，记作</p>
+<p>\{\alpha_1,\dots,\alpha_s\}\cong\{\beta_1,\dots,\beta_r\}
+</p>
+<p>向量组的等价是向量组之间的一种关系。可以证明其具有以下三种性质：</p>
+<p>\begin{aligned}
+&(1)反身性。即任何一个向量组都与自身等价； \\
+&(2)对称性。即如果\alpha_1,\dots,\alpha_s与\beta_1,\dots,\beta_r 等价，那么\beta_1,\dots,\beta_r与\alpha_1,\dots,\alpha_s等价； \\
+&(3)传递性。即如果 \\
+&\qquad \{\alpha_1,\dots,\alpha_s\}\cong\{\beta_1,\dots,\beta_r\},\{\beta_1,\dots,\beta_r\}\cong\{\gamma_1,\dots,\gamma_t\}， \\
+&那么\qquad \qquad \qquad \{\alpha_1,\dots,\alpha_s\}\cong\{\gamma_1,\dots,\gamma_t\}。
+\end{aligned}
+</p>
+<p>3、命题1：向量组与它的极大线性无关组等价。</p>
+<p>推论1：向量组的任意两个极大线性无关组等价。</p>
+<p>推论2：\beta可以由向量组\alpha_1,\dots,\alpha_s线性表出当且仅当\beta可以由\alpha_1,\dots,\alpha_s的一个极大线性无关组线性表出。</p>
+<p>4、引理1：设向量组\beta_1,\dots,\beta_r可以由向量组\alpha_1,\dots,\alpha_s线性表出，如果r>s，那么\beta_1,\dots,\beta_r线性相关。</p>
+<p>推论3：设向量组\beta_1,\dots,\beta_r可以由向量组\alpha_1,\dots,\alpha_s线性表出，如果\beta_1,\dots,\beta_r线性无关，那么r\leqslant s。</p>
+<p>推论4：等价的线性无关的向量组所含向量的个数相等。</p>
+<p>推论5：向量组的任意两个极大线性无关组所含向量的个数相等。</p>
+<p>5、定义3：向量组的极大线性无关组所含向量的个数称为这个<strong>向量组的秩</strong>。</p>
+<p>全由零向量组成的向量组的秩规定为0。</p>
+<p>向量组\alpha_1,\dots,\alpha_s的秩记作rank\{\alpha_1,\dots,\alpha_s\}。</p>
+<p>6、命题2：向量组\alpha_1,\dots,\alpha_s线性无关的充分必要条件是它的秩等于它所含向量的个数。</p>
+<p>7、命题3：如果向量组（1）可以由向量组（2）线性表出，那么：（1）的秩\leqslant（2）的秩</p>
+<p>8、命题4：等价的向量组有相等的秩。（注意：秩相等的向量组不一定等价）</p>
+<h3 id="3-4-子空间的基与维数">3.4 子空间的基与维数</h3>
+<p>1、定义1：设U是K^n的一个子空间，如果\alpha_1,\dots,\alpha_r \in U,并且满足下述两个条件：</p>
+<p>\begin{aligned}
+&(1)\alpha_1,\dots,\alpha_r线性无关，\\
+&(2)U中每一个向量都可以由\alpha_1,\dots,\alpha_r线性表出，
+\end{aligned}
+</p>
+<p>那么称\alpha_1,\dots,\alpha_r是U的一个<strong>基</strong>。</p>
+<p>显然，\varepsilon_1,\dots,\varepsilon_n是K^n的一个基，称它为K^n的<strong>标准基</strong>。</p>
+<p>2、定理1：K^n的任一非零子空间U都有一个基。</p>
+<p>3、定理2：K^n的非零子空间U的任意两个基所含的向量的个数相等。</p>
+<p>4、定义2：K^n的非零子空间U的一个基所含向量的个数称为U的维数，记作dim_K\, U，或者dim \, U。</p>
+<p>零子空间的维数规定为0。</p>
+<p>因为dim \, K^n=n，所以称K^n为n维向量空间。</p>
+<p>对于\alpha=a_1\alpha_1+\dots+a_r\alpha_r，把有序数组(a_1,\dots,a_r )称为\alpha在基\alpha_1,\dots,\alpha_r下的<strong>坐标</strong>。</p>
+<p>5、命题1：设dim \, U=r，则U中任意r+1个向量都线性相关。</p>
+<p>6、命题2：设dim \, U=r，则U中任意r个线性无关的向量都是U的一个基。</p>
+<p>7、命题3：设dim \, U=r，设\alpha_1,\dots,\alpha_r \in U。如果U中每一个向量都可以由$\alpha_1,\dots,\alpha_r 线性表出，那么\alpha_1,\dots,\alpha_r $是U的一个基。</p>
+<p>8、命题4：设U和W都是K^n的非零子空间，如果U\subseteq W，那么dim \, U \leqslant dim \, W。</p>
+<p>9、命题5：设U和W是K^n的两个非零子空间，且U\subseteq W，如果dim \, U = dim \, W，那么U= W。</p>
+<p>10、定理3：向量组\alpha_1,\dots,\alpha_s的一个极大线性无关组是这个向量组生成的子空间<\alpha_1,\dots,\alpha_s>的一个基，从而</p>
+<p>dim<\alpha_1,\dots,\alpha_s>=rank\{\alpha_1,\dots,\alpha_s\}.
+</p>
+<h3 id="3-5-矩阵的秩">3.5 矩阵的秩</h3>
+<p>1、定理1：阶梯型矩阵J的行秩与列秩相等，它们都等于J的非零行的个数；并且J的主元所在的列构成列向量的一个极大线性无关组。</p>
+<p>2、定理2：矩阵的初等行变换不改变矩阵的行秩。</p>
+<p>3、定理3：矩阵的初等行变换不改变矩阵的列向量组的线性相关性，从而不改变矩阵的列秩。</p>
+<p>4、定理4：任一矩阵A的行秩等于它的列秩。</p>
+<p>5、定义1：矩阵A的行秩与列秩统称为A的<strong>秩</strong>，记作rank (A)。</p>
+<p>6、推论1：设矩阵A经过初等行变换化成阶梯型矩阵J，则A的秩等于J的非零行个数。设J的主元所在的列是第j_1,j_2,\dots,j_r列，则A的第j_1,j_2,\dots,j_r列构成A的列向量组的一个极大线性无关组。</p>
+<p>7、推论2：矩阵的初等列变换不改变矩阵的秩。</p>
+<p>8、定理5：任一非零矩阵的秩等于它的不为零的子式的最高阶数。</p>
+<p>9、推论3：设s\times n矩阵A的秩为r，则A的不等于零的r阶子式所在的列（行）构成A的列（行）向量组的一个极大线性无关组。</p>
+<p>10、推论4：n级矩阵A满秩的充分必要条件是|A|\not=0。</p>
+<h3 id="3-6-线性方程组有解的充分必要条件">3.6 线性方程组有解的充分必要条件</h3>
+<p>1、定理1（线性方程组有解判别定理）：数域K上线性方程组</p>
+<p>x_1\alpha_1+\dots+x_n\alpha_n=\beta \tag{1}
+</p>
+<p>有解的充分必要条件是：它的系数矩阵与增广矩阵的秩相等。</p>
+<p>2、定理2：数域K上n元线性方程组（1）有解时，如果它的系数矩阵等于n，那么方程组（1）有唯一解；如果A的秩小于n，那么方程组（1）有无穷多个解。</p>
+<p>推论1：齐次线性方程组有非零解的充分必要条件是：它的系数矩阵的秩小于未知量的个数。</p>
+<h3 id="3-7-齐次线性方程组的解集的结构">3.7 齐次线性方程组的解集的结构</h3>
+<p>数域K上n元齐次线性方程组</p>
+<p>x_1\alpha_1+\dots+x_n\alpha_n=\bold 0\tag{1}
+</p>
+<p>的一个解是K^n中一个向量，称它为齐次线性方程组（1）的一个<strong>解向量</strong>。齐次线性方程组（1）的解集W是K^n的一个非空子集。</p>
+<p>性质1：若\gamma,\delta \in W，则\gamma+\delta \in W.</p>
+<p>性质2：若\gamma \in W,k \in K,则k\gamma \in W.</p>
+<p>由上述得，齐次线性方程组（1）的解集W是K^n的一个子空间，称它为方程组（1）的<strong>解空间</strong>。如果方程组（1）的系数矩阵A的秩等于n，那么W=\{\bold 0 \}。如果rank(A)<n，那么W是非零子空间。从而W有基。把解空间W的一个基称为齐次线性方程组（1）的一个<strong>基础解系</strong>，即：</p>
+<p>定义1：齐次线性方程组（1）有非零解时，如果它的有限多个解\eta_1,\eta_2,\dots,\eta_t满足：</p>
+<p>\begin{aligned}
+&(1)\eta_1,\eta_2,\dots,\eta_t 线性无关；\\
+&(2)齐次线性方程组（1）的每一个解都可以由\eta_1,\eta_2,\dots,\eta_t 线性表出，
+\end{aligned}
+</p>
+<p>那么称\eta_1,\eta_2,\dots,\eta_t是齐次线性方程组（1）的一个<strong>基础解系</strong>。其解集W表示为：</p>
+<p>W=\{k_1\eta_1+k_2\eta_2+\dots+k_t\eta_t \,|\,k_i \in K,i=1,2,\dots,t\}.
+</p>
+<p>通常也说齐次线性方程组（1）的全部解是：</p>
+<p>k_1\eta_1+k_2\eta_2+\dots+k_t\eta_t \, ,\,k_1,k_2,\dots,k_i \in K
+</p>
+<p>定理1：数域K上n元齐次线性方程组的解空间W的维数为</p>
+<p>dim \, W=n-rank(A),\tag{2}
+</p>
+<p>其中A是方程组的系数矩阵。从而当齐次线性方程组（1）有非零解时，它的每个基础解系所含解向量的个数都等于n-rank(A)。</p>
+<h3 id="3-8-非齐次线性方程组的解集的结构">3.8 非齐次线性方程组的解集的结构</h3>
+<p>对于数域K上n元非齐次线性方程组</p>
+<p>x_1\alpha_1+\dots+x_n\alpha_n=\beta \tag{1}
+</p>
+<p>设其解集为U。为此考虑相应的齐次线性方程组</p>
+<p>x_1\alpha_1+\dots+x_n\alpha_n=\bold 0\tag{2}
+</p>
+<p>称它为非齐次线性方程组（1）的<strong>导出组</strong>。导出组的解空间用W表示。</p>
+<p>性质1：若\gamma,\delta \in U，则\gamma-\delta \in W.</p>
+<p>性质2：若\gamma \in U,\eta \in W,则\gamma+\eta \in U.</p>
+<p>定理1：如果数域K上n元非齐次线性方程组（1）有解，那么它的解集U为</p>
+<p>U=\{\gamma_0+\eta \, | \, \eta \in W\}, \tag{3}
+</p>
+<p>其中\gamma_0是非齐次线性方程组（1）的一个解（称\gamma_0是<strong>特解</strong>），W是方程组（1）的导出组的解空间。</p>
+<p>我们把集合\{\gamma_0+\eta \, | \, \eta \in W\}记作\gamma_0+W。称它是一个W型的<strong>线性流形</strong>（或子空间W的一个<strong>陪集</strong>），把dim\,W称为线性流形\gamma_0+W的维数。</p>
+<p>注：U不是子空间，因为U对于加法和数乘都不封闭。</p>
+<p>推论1：如果n元非齐次线性方程组（1）有解，那么它的解唯一的充分必要条件是：它的导出组（2）只有零解。</p>
+<h2 id="4-矩阵的运算">4 矩阵的运算</h2>
+<h3 id="4-1-矩阵的运算">4.1 矩阵的运算</h3>
+<p>1、数域K上两个矩阵称为<strong>相等</strong>，如果它们的行数相等，列数也相等，并且它们的所有元素对应相等。</p>
+<p>2、定义1：设A=(a_{ij}),B=(b_{ij})都是数域K上s \times n矩阵，令</p>
+<p>C=(a_{ij}+b_{ij})_{s \times n},
+</p>
+<p>则称矩阵C是矩阵A与B的和，记作C=A+B。</p>
+<p>3、定义2：设A=(a_{ij})是数域K上s \times n矩阵，k\in K，令</p>
+<p>M=(ka_{ij})_{s \times n},
+</p>
+<p>则称矩阵M是k与矩阵A的<strong>数量乘积</strong>，记作M=kA。</p>
+<p>4、设A=(a_{ij})，矩阵(-a_{ij})称为A的负矩阵，记作—A。容易验证，矩阵的加法与数量乘法运算满足类似于n维向量的加法与数量乘法所满足的8条运算法则。并可由负矩阵概念定义矩阵减法运算。</p>
+<p>5、定义3：设A=(a_{ij})_{s \times n}，B=(b_{ij})_{n \times m}，令</p>
+<p>C=(c_{ij})_{s \times m},
+</p>
+<p>其中</p>
+<p>c_{ij}=a_{i1}b_{1j}+a_{i2}b_{2j}+\dots+a_{in}b_{nj}=\sum_{k=1}^n a_{ik}b_{kj}\, ,\,
+i=1,2,\dots,s;j=1,2,\dots,m.
+</p>
+<p>则称矩阵C为矩阵A与矩阵B的乘积，记作C=AB。</p>
+<p>注：</p>
+<p>（1）只有左矩阵的列数与右矩阵的行数相同的两个矩阵才能相乘；</p>
+<p>（2）乘积矩阵的(i,j)元等于左矩阵的第i行与右矩阵的第j列的对应元素的乘积之和；</p>
+<p>（3）乘积矩阵的行数等于左矩阵的行数，乘积矩阵的列数等于右矩阵的列数。</p>
+<p>6、对于AB=0，若B\not=0，则称A是一个<strong>左零因子</strong>，若A\not=0，则称B是是一个<strong>右零因子</strong>，左零因子和右零因子统称为<strong>零因子</strong>。显然，零矩阵是零因子，称为<strong>平凡的零因子</strong>。</p>
+<p>7、矩阵的乘法适合<strong>结合律</strong>和<strong>左右分配律</strong>。另与数量乘法一起满足：k(AB)=(kA)B=A(kB)。</p>
+<p>8、主对角线上元素都是1，其余元素为0的n级矩阵称为n级<strong>单位矩阵</strong>，记作I_n,或简记I。kI称为<strong>数量矩阵</strong>。</p>
+<p>9、若AB=BA，则称A与B<strong>可交换</strong>。数量矩阵与任一同级矩阵可交换。</p>
+<p>10、由于矩阵的乘法适合结合律，因此可定义n级矩阵A的非负整数次幂：</p>
+<p>\begin{aligned}
+&A^m\xlongequal{\text{def}}A\cdot A\cdot \ldots\cdot A,\,m\in Z^+;\\
+&A^0\xlongequal{\text{def}}I.
+\end{aligned}
+</p>
+<p>容易看出，对于任意自然数k,l有：</p>
+<p>A^kA^l=A^{k+l},\,(A^k)^l=A^{kl}.
+</p>
+<p>注：由于矩阵乘法不满足交换律，故一般来说，(AB)^k\not=A^kB^k。</p>
+<p>11、对于矩阵转置有：</p>
+<p>\begin{aligned}
+(1)\qquad&(A+B)'=A'+B';\\
+(2)\qquad&(kA)'=kA';\\
+(3)\qquad&(AB)'=B'A'.
+\end{aligned}
+</p>
+<h3 id="4-2-特殊矩阵">4.2 特殊矩阵</h3>
+<p>1、对角矩阵</p>
+<p>定义1：主对角线以外的元素全为0的方阵称为<strong>对角矩阵</strong>，简记作：diag\{d_1,d_2,\dots,d_n\}。</p>
+<p>命题1：用一个对角矩阵左（右）乘一个矩阵A，就相当于用对角矩阵的主对角元分别去乘A的相应的行（列）。</p>
+<p>2、基本矩阵</p>
+<p>定义2：只有一个元素是1，其余元素全为0的矩阵称为<strong>基本矩阵</strong>。(i,j)元为1的基本矩阵记作E_{ij}。故：</p>
+<p>A=(a_{ij})_{s \times n}=\begin{bmatrix}
+	a_{11} & a_{12} & ... & a_{1n} \\
+   a_{21} & a_{22} & ... & a_{2n} \\
+   \vdots & \vdots & & \vdots \\
+   a_{s1} & a_{s2} & ... & a_{sn}
+\end{bmatrix}=a_{11}E_{11}+a_{12}E_{12}+\dots+a_{sn}E_{sn}=\sum_{i=1}^s\sum_{j=1}^n a_{ij}E_{ij}.
+</p>
+<p>命题2：用E_{ij}左乘一个矩阵A，就相当于把A的第j行搬到第i行的位置，而乘积矩阵的其余行全为零行；用E_{ij}右乘一个矩阵A，就相当于把A的第j列搬到第i列的位置，而乘积矩阵的其余列全为零列。故：</p>
+<p>\begin{aligned}
+&E_{ij}E_{kl}= \begin{cases}
+   E_{il}&当k=j; \\
+   0&当k\not=j.
+\end{cases} \\
+&E_{ij}AE_{kl}=a_{jk}E_{il}.
+\end{aligned}
+</p>
+<p>3、上（下）三角矩阵</p>
+<p>定义3：主对角线下（上）方元素全为0的方阵称为上（下）三角矩阵。</p>
+<p>A为上三角矩阵的充分必要条件：</p>
+<p>a_{ij}=0,当i>j.\, A=\sum_{i=1}^n\sum_{j=1}^n a_{ij}E_{ij}.
+</p>
+<p>命题3：两个n级上三角矩阵A与B的乘积仍为上三角矩阵，并且AB的主对角线元素等于A与B的相应主对角元的乘积。两个n级下三角矩阵A与B的乘积仍为下三角矩阵，并且AB的主对角线元素等于A与B的相应主对角元的乘积。</p>
+<p>4、初等矩阵</p>
+<p>定义4：由单位矩阵经过一次初等行（列）变换得到的矩阵称为<strong>初等矩阵</strong>。容易得出，初等矩阵只有下面三种类型：</p>
+<p>\begin{aligned}
+&I\xrightarrow{(j)+(i)\cdot k}P(j,i(k)),\\
+&I\xrightarrow{(i,j)}P(i,j),\\
+&I\xrightarrow{(i)\cdot c}P(i(c)),\, c\not=0;
+\end{aligned}
+</p>
+<p>设A是一个s \times n矩阵，它的行向量组是\gamma_1,\gamma_2,\dots,\gamma_s；列向量组是\alpha_1,\alpha_2,\dots,\alpha_n。则</p>
+<p>\begin{aligned}
+&P(j,i(k))A=\begin{bmatrix}
+1   &      &      &      &  &      &  \\
+    &\ddots&      &      &  &      &  \\
+    &      & 1    &      &  &      &  \\
+    &      &\vdots&\ddots&  &      &  \\
+    &      &   k  &\dots &1 &      &  \\
+    &      &      &      &  &\ddots&  \\
+    &      &      &      &  &      & 1
+\end{bmatrix}
+\begin{bmatrix}
+\gamma_1 \\ \gamma_2 \\ \vdots \\ \gamma_s
+\end{bmatrix}=
+\begin{bmatrix}
+\gamma_1 \\ \vdots \\ \gamma_i \\ \vdots \\ k\gamma_i+\gamma_j \\ \vdots \\ \gamma_s
+\end{bmatrix} ,\\
+&AP(j,i(k))=(\alpha_1,\alpha_2,\dots,\alpha_n)\begin{bmatrix}
+1   &      &      &      &  &      &  \\
+    &\ddots&      &      &  &      &  \\
+    &      & 1    &      &  &      &  \\
+    &      &\vdots&\ddots&  &      &  \\
+    &      &   k  &\dots &1 &      &  \\
+    &      &      &      &  &\ddots&  \\
+    &      &      &      &  &      & 1
+\end{bmatrix}=(\alpha_1,\dots,\alpha_i+k\alpha_j,\dots,\alpha_j,\dots,\alpha_n)
+\end{aligned}
+</p>
+<p>由上诉看出：</p>
+<p>\begin{aligned}
+&用P(j,i(k))左乘A，就相当于把A的第i行的k倍加到第j行上，其余行不变；\\
+&用P(j,i(k))右乘A，就相当于把A的第j列的k倍加到第i列上，其余列不变；\\
+&用P(i,j)左（右）乘A，就相当于把A的第i行（列）与第j行（列）互换，其余行（列）不变；\\
+&用P(i(c))(c\not=0)左（右）乘A，就相当于用c乘A的第i行（列），其余行（列）不变。
+\end{aligned}
+</p>
+<p>定理1：用初等矩阵左（右）乘一个矩阵A，就相当于A作了一次相应的初等行（列）变换。</p>
+<p>5、对称矩阵</p>
+<p>定义5：一个矩阵A如果满足A'=A，那么称A是<strong>对称矩阵</strong>。</p>
+<p>命题4：设A、B都是数域K上的n级对称矩阵，则A+B，kA(k\in K)都是对称矩阵。</p>
+<p>命题5：设A、B都是数域K上的n级对称矩阵，则AB为对称矩阵的充分必要条件是A与B可交换。</p>
+<p>6、斜对称矩阵</p>
+<p>定义6：一个矩阵A如果满足A'=-A，那么称A是<strong>斜对称矩阵</strong>。</p>
+<p>命题6：数域K上奇数级斜对称矩阵的行列式等于0。</p>
+<h3 id="4-3-矩阵乘积的秩与行列式">4.3 矩阵乘积的秩与行列式</h3>
+<p>1、定理1：设A=(a_{ij})_{s \times n},B=(b_{ij})_{n \times m}，则：rank(AB)\leqslant min\{rank(A),rank(B)\}.</p>
+<p>2、定理2：设A=(a_{ij})_{n \times n},B=(b_{ij})_{n \times n}，则：|AB|=|A||B|.</p>
+<p>3、定理3（Binet-Cauchy公式）：A=(a_{ij})_{s \times n},B=(b_{ij})_{n \times s}，</p>
+<p>\begin{aligned}
+&(1)如果s>n，那么|AB|=0；\\
+&(2)如果s\leqslant n，那么|AB|等于A的所有s阶子式与B的相应s阶子式的乘积之和，即\\
+&|AB|=\sum_{1\leqslant v_1<v_2<\dots<v_s\leqslant n} A\begin{pmatrix}
+   1,2,\dots,s \\
+   v_1,v_2,\dots,v_s
+\end{pmatrix}\cdot B\begin{pmatrix}
+  v_1,v_2,\dots,v_s \\
+   1,2,\dots,s
+\end{pmatrix}.
+\end{aligned}
+</p>
+<p>4、命题1：设A=(a_{ij})_{s \times n},B=(b_{ij})_{n \times s}，设正整数r\leqslant s，</p>
+<p>\begin{aligned}
+&(1)如果r>n，那么AB的所有r阶子式都等于0；\\
+&(2)如果r\leqslant n，那么AB的任一r阶子式为\\
+&AB\begin{pmatrix}
+  i_1,i_2,\dots,i_r \\
+   j_1,j_2,\dots,j_r
+\end{pmatrix}=\sum_{1\leqslant v_1<v_2<\dots<v_r\leqslant n} A\begin{pmatrix}
+   i_1,i_2,\dots,i_r \\
+   v_1,v_2,\dots,v_r
+\end{pmatrix}\cdot B\begin{pmatrix}
+  v_1,v_2,\dots,v_r \\
+   j_1,j_2,\dots,j_r
+\end{pmatrix}.
+\end{aligned}
+</p>
+<p>5、矩阵A的一个子式如果行指标与列指标相同，那么称它为A的一个<strong>主子式</strong>。</p>
+<h3 id="4-4-可逆矩阵">4.4 可逆矩阵</h3>
+<p>1、定义1：对于数域K上矩阵A，如果存在数域K上矩阵B，使得</p>
+<p>AB=BA=I \tag{1}
+</p>
+<p>那么称A是<strong>可逆矩阵</strong>（或<strong>非奇异矩阵</strong>）。</p>
+<p>2、定义2：如果A是可逆矩阵，那么适合（1）式的矩阵B称为A的<strong>逆矩阵</strong>，记作A^{-1}。A^{-1}是唯一的。</p>
+<p>3、定理1：数域K上n级矩阵A可逆的充分必要条件是|A|\not=0。当A可逆时，</p>
+<p>A^{-1}=\frac 1 {|A|} A^*. \tag{2}
+</p>
+<p>称A^{*}为A的<strong>伴随矩阵</strong>。满足AA^{*}=A^{*}A=|A|I。</p>
+<p>数域K上n级矩阵A可逆的充分必要条件汇总：</p>
+<p>\begin{aligned}
+&数域K上n级矩阵A可逆 \\
+\iff&|A|\not=0\\
+\iff&A为满秩矩阵\\
+\iff&A的行（列）向量组线性无关 \\
+\iff&A的行（列）向量组为K^{n}的一个基\\
+\iff&A的行（列）空间等于K^{n}\\
+\iff&A可以表示成一些初等矩阵的乘积。
+\end{aligned}
+</p>
+<p>命题1：设A与B都是数域K上的n级矩阵，如果AB=I，那么A与B都是可逆矩阵，并且A^{-1}=B,B^{-1}=A。</p>
+<p>4、可逆矩阵的性质：</p>
+<p>\begin{aligned}
+&性质1：单位矩阵I可逆，且I^{-1}=I。\\
+&性质2：如果A可逆，那么A^{-1}也可逆，且(A^{-1})^{-1}=A。\\
+&性质3：如果n级矩阵A、B都可逆，那么AB也可逆，并且(AB)^{-1}=B^{-1}A^{-1}。推广：(A_1A_2\dots A_s)^{-1}=A_s^{-1}\dots A_2^{-1}A_1^{-1}。\\
+&性质4：如果A可逆，那么A'也可逆，并且(A')^{-1}=(A^{-1})'。\\
+&性质5：可逆矩阵经过初等行变换化成的简化行阶梯形矩阵一定是单位矩阵。\\
+&性质6：矩阵A可逆的充分必要条件是它可以表示成一些初等矩阵的乘积。\\
+&性质7：用一个可逆矩阵左（右）乘一个矩阵A，不改变A的秩。
+\end{aligned}
+</p>
+<p>5、<strong>初等变换法</strong>求逆矩阵：</p>
+<p>(A,I)\xrightarrow{\text{初等行变换}}(I,A^{-1})
+</p>
+<h3 id="4-5-矩阵的分块">4.5 矩阵的分块</h3>
+<p>1、对于分块矩阵A=\begin{bmatrix}A_1&A_2\\A_3&A_4 \end{bmatrix},A'=\begin{bmatrix}A_1'&A_3'\\A_2'&A_4' \end{bmatrix}。</p>
+<p>2、分块矩阵相乘需满足下列条件：</p>
+<p>\begin{aligned}
+&(1)左矩阵的列组数等于右矩阵的行组数；\\
+&(2)左矩阵每个列组所含列数等于右矩阵相应行组所含行数。
+\end{aligned}
+</p>
+<p>3、命题1：设A是s \times n矩阵，B是n \times m矩阵，B的列向量组为\beta_1,\beta_2,\dots,\beta_m。则</p>
+<p>AB=A(\beta_1,\beta_2,\dots,\beta_m)=(A\beta_1,A\beta_2,\dots,A\beta_m).
+</p>
+<p>推论1：设A_{s \times n}\not=0,B_{n \times m}的列向量组是\beta_1,\beta_2,\dots,\beta_m。则</p>
+<p>AB=\bold 0\iff\beta_1,\beta_2,\dots,\beta_m 都是齐次线性方程组AX=\bold 0的解。
+</p>
+<p>推论2：设A_{s \times n}\not=0,B_{n \times m}的列向量组是\beta_1,\beta_2,\dots,\beta_m;C_{s \times m}的列向量组是\delta_1,\delta_2,\dots,\delta_m。则</p>
+<p>AB=C\iff\beta_i是线性方程组AX=\delta_i的一个解，i=1,2,\dots,m.
+</p>
+<p>4、分块矩阵的初等行变换：</p>
+<p>\begin{aligned}
+&(1)把一个块行的左P倍（P是矩阵）加到另一个块行上，如\\
+&\qquad \begin{bmatrix}A_1&A_2\\A_3&A_4 \end{bmatrix}\xrightarrow{(2)+P\cdot (1)}
+\begin{bmatrix}A_1&A_2\\PA_1+A_3&PA_2+A_4 \end{bmatrix};\\
+&(2)互换两个块行的位置；\\
+&(3)用一个可逆矩阵左乘某一块行（为的是可以把所得到的分块矩阵变回原来的分块矩阵）。
+\end{aligned}
+</p>
+<p>类似的有分块矩阵的初等列变换。</p>
+<p>把单位矩阵分块，并经过一次分块矩阵的初等行（列）变换得到的矩阵称为<strong>分块初等矩阵</strong>。</p>
+<p>5、分块对角矩阵：diag\{A_1,A_2,\dots,A_s\},其中A_i是方阵,i=1,2,\dots,s.</p>
+<p>6、<strong>分块上（下）三角矩阵</strong>：主对角线上子矩阵都是方阵，而位于主对角线上（下）方的所有矩阵都为0。</p>
+<p>性质：\begin{vmatrix} A&0\\C&B\end{vmatrix}=|A||B|.</p>
+<p>7、命题2：设A、B分别是s \times n、n \times s矩阵，则</p>
+<p>\begin{aligned}
+&(1)\begin{vmatrix} I_n&B\\ A&I_s\end{vmatrix}=|I_s-AB|;\\
+&(2)\begin{vmatrix} I_n&B\\ A&I_s\end{vmatrix}=|I_n-BA|;\\
+&(3)|I_s-AB|=|I_n-BA|.
+\end{aligned}
+</p>
+<p>8、命题3：设A=\begin{bmatrix}A_1&A_3\\0&A_2 \end{bmatrix}，其中A_1，A_2都是方阵。则A可逆当且仅当A_1，A_2都可逆，此时</p>
+<p>A^{-1}=\begin{bmatrix}A_1^{-1}&-A_1^{-1}A_3A_2^{-1}\\0&A_2^{-1} \end{bmatrix}.
+</p>
+<h3 id="4-6-正交矩阵-cdot欧几里得空间R-n">4.6 正交矩阵\cdot欧几里得空间R^n</h3>
+<p>1、定义1：实数域上的n级矩阵A如果满足：AA'=I，那么称A是正交矩阵。</p>
+<p>命题1：实数域上的n级矩阵A是正交矩阵</p>
+<p>\begin{aligned}
+&\iff AA'=I\\
+&\iff A可逆，且A^{-1}=A'\\
+&\iff A'A=I
+\end{aligned}
+</p>
+<p>正交矩阵具有下列性质：</p>
+<p>\begin{aligned}
+&(1)I是正交矩阵；\\
+&(2)若A和B是正交矩阵，则AB也是正交矩阵；\\
+&(3)若A是正交矩阵，则A^{-1}（即A'）也是正交矩阵；\\
+&(4)若A是正交矩阵，则|A|=1或-1。
+\end{aligned}
+</p>
+<p>命题2：设实数域上n级矩阵A的行向量组为\gamma_1,\dots,\gamma_n；列向量组为\alpha_1,\dots,\alpha_n。则</p>
+<p>\begin{aligned}
+&(1)A为正交矩阵当且仅当A的行向量组满足：\gamma_i\gamma_j'=\begin{cases}1,\qquad 当i=j,\\0,\qquad 当i\not=j;\end{cases}\\
+&(1)A为正交矩阵当且仅当A的列向量组满足：\alpha_i'\alpha_j=\begin{cases}1,\qquad 当i=j,\\0,\qquad 当i\not=j.\end{cases}
+\end{aligned}
+</p>
+<p>引用Kronecker记号\delta_{ij},\delta_{ij}=\begin{cases}1,\qquad 当i=j,\\0,\qquad 当i\not=j.\end{cases}。故命题2可简记为：</p>
+<p>\begin{aligned}
+&(1)\gamma_i\gamma_j'=\delta_{ij},1\leqslant i,j\leqslant n; \\
+&(2)\alpha_i'\alpha_j=\delta_{ij},1\leqslant i,j\leqslant n;
+\end{aligned}
+</p>
+<p>2、定义2：在R^n中，任给\alpha=(a_1,a_2,\dots,a_n),\beta=(b_1,b_2,\dots,b_n)，规定</p>
+<p>(\alpha,\beta)\xlongequal{\text{def}}a_1b_1+a_2b_2+\dots+a_nb_n,\tag{1}
+</p>
+<p>这个二元实值函数(\alpha,\beta)称为R^n的一个<strong>内积</strong>（通常也称为<strong>标准内积</strong>）。（1）式可写为(\alpha,\beta)=\alpha\beta'.</p>
+<p>可验证R^n的标准内积具有以下性质：</p>
+<p>\begin{aligned}
+&(1)(\alpha,\beta)=(\beta,\alpha)，对称性\\
+&(2)(\alpha+\gamma,\beta)=(\alpha,\beta)+(\gamma,\beta)，线性性1\\
+&(3)(k\alpha,\beta)=k(\alpha,\beta)，线性性2\\
+&(4)(\alpha,\alpha)\geqslant 0，等号成立当且仅当\alpha=\bold 0。（正定性）
+\end{aligned}
+</p>
+<p>定义了内积之后，n维向量空间R^n就被称为一个<strong>欧几里得空间</strong>。</p>
+<p>在欧几里得空间R^n中规定向量\alpha 的长度：|\alpha|\xlongequal{\text{def}}\sqrt{(\alpha,\alpha)}.</p>
+<p>长度为1的向量称为单位向量，把非零向量\alpha乘以\frac 1 {|\alpha|}称为把**\alpha单位化**。</p>
+<p>如果(\alpha,\beta)=0，那么称\alpha与\beta是<strong>正交</strong>的，记作\alpha \bot \beta。非零向量组成的向量组如果向量两两正交，则称为<strong>正交向量组</strong>。类似可定义<strong>正交单位向量组</strong>。</p>
+<p>命题3：欧几里得空间R^n中，正交向量组一定是线性无关的。</p>
+<p>根据命题3得，欧几里得空间R^n 中，n个向量组成的正交向量组一定是R^n的一个基，称它为<strong>正交基</strong>。n个单位向量组成的向量组称为<strong>标准正交基</strong>。</p>
+<p>命题4：实数域上n级矩阵A是正交矩阵的充分必要条件为：A的行（列）向量组是欧几里得空间R^n的一个标准正交基。</p>
+<p>3、定理1：设\alpha_1,\dots,\alpha_s是欧几里得空间R^n中一个线性无关的向量组，令</p>
+<p>\begin{aligned}
+&\beta_1=\alpha_1\\
+&\beta_2=\alpha_2-\frac {(\alpha_2,\beta_1)} {(\beta_1,\beta_1)} \beta_1,\\
+&\dots\\
+&\beta_s=\alpha_s-\sum_{j=1}^{s-1} \frac {(\alpha_s,\beta_j)} {(\beta_j,\beta_j)} \beta_j,
+\end{aligned}\tag{2}
+</p>
+<p>则\beta_1,\beta_2,\dots,\beta_s是正交向量组，并且\beta_1,\beta_2,\dots,\beta_s与\alpha_1,\dots,\alpha_s等价。</p>
+<p>定理1称为<strong>施密特（Schmidt）正交化过程</strong>。只要再进行单位化，就能得到正交单位向量组，即R^n的标准正交基。</p>
+<h3 id="4-7-从K-n到K-s的线性映射">4.7 从K^n到K^s的线性映射</h3>
+<p>1、定义1：设S和S'是两个集合，如果存在一个对应法则f，使得集合S中每一个元素a，都有集合S'中唯一确定的元素b与之对应，那么称f是集合S到S'的一个<strong>映射</strong>，记作</p>
+<p>\begin{aligned}
+f:&S\rightarrow S'\\&a\mapsto b,
+\end{aligned}
+</p>
+<p>其中，b称为a在f下的<strong>象</strong>，a称为b在f下的<strong>一个原象</strong>。b在f下的<strong>原象集</strong>记作f^{-1}(b)。a在f下的象用符号f(a)或fa表示，于是映射f也可以记成</p>
+<p>f(a)=b,a\in S
+</p>
+<p>2、设f是集合S到集合S’的一个映射，则把S叫做映射f的<strong>定义域</strong>，把S’叫做f的<strong>陪域</strong>。S的所有元素在f下的象组成的集合叫做f的<strong>值域</strong>或**f的象**，记作f(S)或Imf。即</p>
+<p>f(S)=\text{Im}f\xlongequal{\text{def}}\{f(a)\,|\,a\in S\}=\{b\in S'\,|\,存在a\in S使f(a)=b\}.
+</p>
+<p>3、设f是集合S到集合S’的一个映射，如果f(S)=S'，那么称f是<strong>满射</strong>（或f是S到S’上的映射）。f是满射当且仅当f的陪域中每一个元素都有至少一个原象。</p>
+<p>如果映射f的定义域S中不同的元素的象也不同，那么称f是<strong>单射</strong>（或f是一对一映射）。f是单射当且仅当从a_1,a_2\in S且f(a_1)=f(a_2)可以推出a_1=a_2。</p>
+<p>如果映射f既是单射，又是满射，那么称f是<strong>双射</strong>（或f是S到S’的一个一一对应）。f是双射当且仅当陪域中每一个元素都有唯一的一个原象。</p>
+<p>映射f与映射g称为<strong>相等</strong>，如果他们的定义域相等，陪域相等，并且对应法则相同。（即\forall x\in S,有f(x)=g(x)）。</p>
+<p>集合S到自身的一个映射，通常称为S上的一个<strong>变换</strong>。</p>
+<p>4、定义2：映射f:S\rightarrow S，如果把S中每一个元素对应到它自身，即\forall x\in S,有f(x)=x，那么称f是<strong>恒等映射</strong>（或S上的<strong>恒等变换</strong>），记作：1_s。</p>
+<p>5、定义3：相继施行映射g:S\rightarrow S'和f:S'\rightarrow S''，得到S到S''的一个映射，称为f与g的<strong>乘积</strong>（或<strong>合成</strong>），记作fg。即</p>
+<p>(fg)(a)\xlongequal{\text{def}}f(g(a)),\forall a\in S.
+</p>
+<p>定理1：映射的乘法适合结合律。即如果h:S\rightarrow S',g:S'\rightarrow S'',f:S''\rightarrow S'''，那么f(gh)=(fg)h.</p>
+<p>注意映射的乘法不适合交换律，但对于f:S\rightarrow S',有f1_s=1_sf=f.</p>
+<p>6、定义4：设f:S\rightarrow S'，如果存在一个映射g:S'\rightarrow S使得fg=gf=1_s，那么称映射f是可逆的，此时称g是f的一个<strong>逆映射</strong>。</p>
+<p>定理2：映射f:S\rightarrow S'是可逆的充分必要条件为f是双射。</p>
+<p>7、定义5：数域K上的向量空间K^n 到K^s的一个映射\sigma如果保持加法和数量乘法，即\forall \alpha,\beta \in K^n,k\in K，有</p>
+<p>\begin{aligned}
+\sigma(\alpha+\beta)&=\sigma(\alpha)+\sigma(\beta),\\
+\sigma(k\alpha)&=k\sigma(\alpha),
+\end{aligned}
+</p>
+<p>那么称\sigma是K^n 到K^s的一个<strong>线性映射</strong>。</p>
+<p>设A是数域K上s \times n矩阵，令</p>
+<p>\begin{aligned}
+A:&K^n\rightarrow K^s\\&\alpha\mapsto A\alpha,
+\end{aligned}\tag{1}
+</p>
+<p>则容易验证A是\sigma是K^n 到K^s的一个线性映射。</p>
+<p>事实1：数域K上n元线性方程组AX=\beta有解</p>
+<p>\begin{aligned}
+\iff&存在\gamma \in K^n,使得A\gamma=\beta\\
+\iff&存在\gamma \in K^n,使得A(\gamma)=\beta\\
+\iff&\beta \in \text{Im}A.
+\end{aligned}
+</p>
+<p>事实2：设数域K上s \times n矩阵A的列向量组是\alpha_1,\dots,\alpha_n，则</p>
+<p>\begin{aligned}
+&\beta\in \text{Im}A\\
+\iff&线性方程组AX=\beta有解\\
+\iff&\beta \in <\alpha_1,\dots,\alpha_n>.
+\end{aligned}
+</p>
+<p>因此\qquad \text{Im}A=<\alpha_1,\dots,\alpha_n></p>
+<p>即，由（1）式定义的映射A的象（值域）等于矩阵A的列空间，从而ImA是K^s的一个子空间。</p>
+<p>事实3：设数域K上齐次线性方程组AX=\bold 0的解空间是W，则</p>
+<p>\eta \in W \iff A\eta=\bold 0 \iff A(\eta)=\bold 0.
+</p>
+<p>8、定义6：设\sigma 是K^n到K^s的一个映射，K^n的一个子集\{\alpha \in K^n|\sigma(\alpha)=\bold 0\}称为\sigma的<strong>核</strong>，记作：Ker \sigma</p>
+<p>容易验证Ker \sigma是K^n的一个子空间。</p>
+<p>由（1）式定义的线性映射A的核等于齐次线性方程组AX=\bold 0的解空间。即：Ker \sigma=W</p>
+<p>综上，有：</p>
+<p>dim \,\text{Ker}\,A+dim\,\text{Im}\,A=dim\,K^n.
+</p>
+<h2 id="5-矩阵的相抵与相似">5 矩阵的相抵与相似</h2>
+<h3 id="5-1-等价关系与集合的划分">5.1 等价关系与集合的划分</h3>
+<p>1、设S,M是两个集合，则集合  \{(a,b)|a \in S,b \in W\}  称为S与M的<strong>笛卡儿积</strong>，记作：S \times M。</p>
+<p>2、定义1：设S是一个非空集合，我们把S \times S的一个子集W叫做S上的一个<strong>二元关系</strong>。如果a,b)\in W，那么称a与b有W关系；反之没有W关系。当a与b有W关系时，记作aWb，或a\sim b。</p>
+<p>3、定义2：集合S上的一个二元关系\sim如果具有下述性质：\forall a,b,c\in S，有</p>
+<p>\begin{aligned}
+&(1)a\sim a &（反身性）；\\
+&(2)a\sim b\implies b\sim a& （对称性）；\\
+&(3)a\sim b且b\sim c \implies a\sim c &（传递性）。
+\end{aligned}
+</p>
+<p>那么称\sim是S上的一个<strong>等价关系</strong>。</p>
+<p>4、定义3：设\sim是S上的一个等价关系，a\in S，令</p>
+<p>\bar{a}\xlongequal{\text{def}}\{x\in S|x\sim a\},
+</p>
+<p>则称\bar{a}是由a确定的<strong>等价类</strong>。</p>
+<p>事实1：a\in \bar{a}于是也把\bar{a}称为a的等价类。</p>
+<p>事实2：x\in bar{a}\iff x\sim a.</p>
+<p>事实3：\bar{x}=\bar{y}\iff x\sim y.</p>
+<p>5、定理1：设\sim是集合S上的一个等价关系，任取a,b\in S，则\bar{a}=\bar{b}或者\bar{a}\cap\bar{b}=\varnothing.</p>
+<p>6、定义4：如果集合S是一些非空子集S_i（i\in I，这里I表示指标集）的并集，并且其中不相等的子集一定不相交，那么称集合\{S_i|i\in I\}是S的一个<strong>划分</strong>，记作：\pi(S)。</p>
+<p>7、定理2：设\sim是集合S上的一个等价关系，则所有等价类组成的集合是S的一个划分，记作：\pi_\sim(S)。</p>
+<p>8、定义5：设\sim是集合S上的一个等价关系。由所有等价类组成的集合称为S对于关系\sim的<strong>商集</strong>，记作：S/\sim。</p>
+<h3 id="5-2-矩阵的相抵">5.2 矩阵的相抵</h3>
+<p>1、定义1：对于数域K上s \times n矩阵A和B，如果从A经过一系列初等行变换和初等列变换能变成矩阵B，那么称A与B是<strong>相抵</strong>的，记作：A\overset{相抵}{\sim}B。</p>
+<p>容易验证相抵是M_{s \times n}(K)上的一个等价关系。在相抵关系下，矩阵A的等价类称为A的<strong>相抵类</strong>。</p>
+<p>事实1：数域K上s \times n矩阵A和B相抵</p>
+<p>\begin{aligned}
+\iff&A可以经过初等行变换和初等列变换变成B，\\
+\iff&存在K上s级初等矩阵P_1,P_2,\dots,P_t与n级初等矩阵Q_1,Q_2,\dots,Q_m，使得\\
+&P_t\dots P_2P_1AQ_1Q_2\dots Q_m=B.\\
+\iff&存在K上s级可逆矩阵P与n级可逆矩阵Q，使得：\\
+&PAQ=B.&(1)
+\end{aligned}
+</p>
+<p>2、定理1：设数域K上s \times n矩阵A的秩为r。如果r>0，那么A相抵于下述形式的矩阵：</p>
+<p>\begin{pmatrix}
+I_r&0\\
+0&0
+\end{pmatrix},\tag{2}
+</p>
+<p>称矩阵（2）为A的<strong>相抵标准形</strong>；如果r=0，那么A相抵于零矩阵，此时称A的相抵标准形是零矩阵。</p>
+<p>3、定理2：数域K上s \times n矩阵A和B相抵当且仅当它们的秩相等。</p>
+<p>4、推论1：设数域K上s \times n矩阵A的秩为r(r>0)，则存在K上的s级、n级可逆矩阵P、Q，使得</p>
+<p>A=P\begin{pmatrix}I_r&0\\0&0\end{pmatrix}Q.\tag{3}
+</p>
+<h3 id="5-3-广义逆矩阵">5.3 广义逆矩阵</h3>
+<p>1、定理1：设A是数域K上s \times n非零矩阵，则矩阵方程</p>
+<p>AXA=A\tag{1}
+</p>
+<p>一定有解。如果tank(A)=r，并且</p>
+<p>A=P\begin{pmatrix}I_r&0\\0&0\end{pmatrix}Q.\tag{2}
+</p>
+<p>其中P、Q分别是K上s级、n级可逆矩阵，那么矩阵方程（2）的通解为</p>
+<p>X=Q^{-1}\begin{pmatrix}I_r&B\\C&D\end{pmatrix}P_{-1}\tag{3}
+</p>
+<p>其中B、C、D分别是数域K上任意的r \times (s-r),(n-r) \times r,(n-r)\times (s-r)矩阵。</p>
+<p>2、定义1：设A是数域K上s \times n矩阵，矩阵方程AXA=A的每一个解都称为A的一个<strong>广义逆矩阵</strong>，简称A的<strong>广义逆</strong>，用A^-表示A的任意一个广义逆。</p>
+<p>任意一个s \times n矩阵都是0_{s \times n}的广义逆。</p>
+<p>3、定理2（非齐次线性方程组的相容定理）：非齐次线性方程组AX=\beta有解的充分必要条件是：</p>
+<p>\beta=AA^-\beta.\tag{4}
+</p>
+<p>4、定理3（非齐次线性方程组的解的结构定理）：非齐次线性方程组AX=\beta有解时，它的通解为：</p>
+<p>X=A^-\beta.\tag{5}
+</p>
+<p>5、定理4（齐次线性方程组的解的结构定理）：数域K上n元齐次线性方程组AX=<strong>0</strong>的通解为：</p>
+<p>X=(I_n-A^-A)Z.\tag{6}
+</p>
+<p>其中A^-是A的任意给定的一个广义逆，Z取遍K^n中任意列向量。</p>
+<p>推论1：设数域K上n元非齐次线性方程组AX=\beta有解，则它的通解为</p>
+<p>X=A^-\beta+(I_n-A^-A)Z.\tag{7}
+</p>
+<p>其中A^-是A的任意给定的一个广义逆，Z取遍K^n中任意列向量。</p>
+<p>6、定义2：设A是复数域上s \times n矩阵，矩阵方程组</p>
+<p>\begin{cases}
+AXA&=A\\
+XAX&=X\\
+(AX)^*&=AX\\
+(XA)^*&=XA
+\end{cases}\tag{8}
+</p>
+<p>称为A的<strong>Penrose 方程组</strong>，它的解称为A的<strong>Moore-Penrose 广义逆</strong>，记作：A^+。（8）式中(AX)^*表示把AX的每个元素取共轭复数得到的矩阵再转置。</p>
+<p>7、定理5：如果A是复数域上s \times n非零矩阵，A的 Penrose 方程组总是有解，并且它的解唯一。设A=BC，其中B、C分别是列满秩与行满秩矩阵，则 Penrose 方程组的唯一解是</p>
+<p>X=C^*(CC^*)^{-1}(B^*B)^{-1}B^*.\tag{9}
+</p>
+<h3 id="5-4-矩阵的相似">5.4 矩阵的相似</h3>
+<p>1、定义1：设A与B都是数域K上n级矩阵，如果存在数域K上一个n级可逆矩阵P，使得</p>
+<p>P^{-1}AP=B,\tag{1}
+</p>
+<p>那么称A与B是<strong>相似</strong>的，记作：A\sim B。</p>
+<p>相似关系是一种等价关系，相似关系下的等价类称为<strong>相似类</strong>。相似具有下列性质：</p>
+<p>性质1：如果B_1=P^{-1}A_1P,\,B_2=P^{-1}A_2P，那么</p>
+<p>\begin{aligned}
+B_1+B_2&=P^{-1}(A_1+A_2)P,\\
+B_1B_2&=P^{-1}(A_1A_2)P,\\
+B_1^m&=P^{-1}A_1^mP,
+\end{aligned}
+</p>
+<p>其中m是正整数。</p>
+<p>性质2：相似的矩阵其行列式的值相等。</p>
+<p>性质3：相似的矩阵或者都可逆，或者都不可逆；当他们可逆时，它们的你矩阵也相似。</p>
+<p>性质4：相似的矩阵有相等的秩。</p>
+<p>2、定义2：n级矩阵A=(a_{ij})的主对角线上元素的和称为A的<strong>迹</strong>，记作 tr(A)。即</p>
+<p>tr(A)=a_{11}+a_{22+\dots+a_{nn}}\tag{2}
+</p>
+<p>命题1：矩阵的迹具有下列性质：</p>
+<p>\begin{aligned}
+tr(A+B)&=tr(A)+tr(B),\\
+tr(kA)&=k\cdot tr(A),\\
+tr(AB)&=tr(BA).
+\end{aligned}
+</p>
+<p>由此可见，矩阵的迹是从矩阵乘法的非交换性中提取的可交换的量。</p>
+<p>性质5：相似的矩阵有相等的迹。</p>
+<p>性质2、4、5表明：矩阵的行列式、秩、迹都是相似关系下的不变量，简称为<strong>相似不变量</strong>。</p>
+<p>3、如果n级矩阵A能够相似于一个对角矩阵，那么称A<strong>可对角化</strong>。</p>
+<p>定理1：数域K上n级矩阵可对角化的充分必要条件是，K^n中有n个线性无关的列向量\alpha_1,\alpha_2,\dots,\alpha_n，以及K中有n个数\lambda_1,\lambda_2,\dots,\lambda_n（它们之中有些可能相等），使得</p>
+<p>A\alpha_i=\lambda_i\alpha_i,\qquad i=1,2,\dots,n.\tag{3}
+</p>
+<p>这时，令P=（\alpha_1,\alpha_2,\dots,\alpha_n），则</p>
+<p>P^{-1}AP=diag\{\lambda_1,\lambda_2,\dots,\lambda_n\}.\tag{4}
+</p>
+<h3 id="5-5-矩阵的特征值和特征向量">5.5 矩阵的特征值和特征向量</h3>
+<p>1、定义1：设A是数域K上n级矩阵，如果K^n中有非零列向量\alpha，使得</p>
+<p>A\alpha=\lambda_0\alpha,且\lambda_0\in K,
+</p>
+<p>那么称\lambda_0是A的一个<strong>特征值</strong>，称向量\alpha是A的属于特征值\lambda_0的一个<strong>特征向量</strong>。</p>
+<p>如果\alpha是A的属于特征值\lambda_0的一个特征向量，那么显然，当k\not=0时，k\alpha也是A的属于特征值\lambda_0的一个特征向量。</p>
+<p>注意：零向量不是A的特征向量。</p>
+<p>\begin{aligned}
+&\lambda_0是A的一个特征值，\alpha是A的属于\lambda_0的一个特征向量\\
+\iff&A\alpha=\lambda_0\alpha,\alpha\not=\bold 0,\lambda_0\in K\\
+\iff&(\lambda_0I-A)\alpha=\bold 0,\alpha\not=\bold 0,\lambda_0\in K\\
+\iff&\alpha 是齐次线性方程组(\lambda_0I-A)X=\bold 0的一个非零解，\lambda_0\in K\\
+\iff&|\lambda_0I-A|=0,\alpha 是(\lambda_0I-A)X=\bold 0的一个非零解，\lambda_0\in K\\
+\iff&\lambda_0是多项式|\lambda I-A|在K中的一个根，\alpha 是(\lambda_0I-A)X=\bold 0的一个非零解。
+\end{aligned}
+</p>
+<p>把|\lambda  I-A|称为A的<strong>特征多项式</strong>。</p>
+<p>2、定理1：设A是数域K上n级矩阵，则</p>
+<p>\begin{aligned}
+&(1)\lambda_0 是A的一个特征值当且仅当\lambda_0是A的特征多项式|\lambda  I-A|在K中的一个根；\\
+&(2)\alpha 是A的属于特征值\lambda_0的一个特征向量当且仅当\alpha是齐次线性方程组(\lambda_0I-A)X=\bold 0的一个非零解。
+\end{aligned}
+</p>
+<p>设\lambda_0是A的一个特征值，把齐次线性方程组(\lambda_0I-A)X=\bold 0的解空间称为A的属于\lambda_0的<strong>特征子空间</strong>，其中全部非零向量就是A的属于\lambda_0的全部特征向量。</p>
+<p>相似矩阵性质：</p>
+<p>性质1：相似的矩阵具有相等的特征多项式。</p>
+<p>性质2：相似的矩阵有相同的特征值（包括重复特征值数量，简称重数相同）。</p>
+<p>由性质1、2看出，矩阵的特征多项式和特征值都是相似不变量。</p>
+<p>命题1：设A是数域K上n级矩阵，则A的特征多项式|\lambda  I-A|是一个n次多项式，\lambda^n的系数是1，\lambda^{n-1}的系数是等于-tr(A)，常数项为(-1)^n|A|，\lambda^{n-k}的系数为A的所有k阶主子式的和乘以(-1)^k,1\leqslant k<n。</p>
+<p>3、定义2：设A是数域K上n级矩阵，\lambda_1是A的一个特征值。把A的属于\lambda_1的特征子空间的维数叫做特征值\lambda_1的<strong>几何重数</strong>，而把\lambda_1作为作为A的特征多项式的根的重数叫做\lambda_1的<strong>代数重数</strong>，把代数重数简称为重数。</p>
+<p>命题2：设\lambda_1是数域K上n级矩阵A的一个特征值，则\lambda_1的几何重数不超过它的代数重数。</p>
+<h3 id="5-6-矩阵可对角化的条件">5.6 矩阵可对角化的条件</h3>
+<p>1、定理1：数域K上n级矩阵A可对角化的充分必要条件是A有n个线性无关的特征向量\alpha_1,\alpha_2,\dots,\alpha_n，此时</p>
+<p>\begin{aligned}
+&令&P&=(\alpha_1,\alpha_2,\dots,\alpha_n),\\
+&则&P^{-1}AP&=diag\{\lambda_1,\lambda_2,\dots,\lambda_n \},
+\end{aligned}
+</p>
+<p>其中\lambda_i是\alpha_i所属的特征值，i=1,2,\dots,n。上述对角矩阵称为A 的<strong>相似标准形</strong>，除了主对角线上元素的排列次序外，A的相似标准形是唯一的。</p>
+<p>2、定理2：设\lambda_1,\lambda_2是数域K上n级矩阵A的不同的特征值，\alpha_1,\alpha_2,\dots,\alpha_s与\beta_1,\beta_2,\dots,\beta_r分别是A的属于\lambda_1,\lambda_2的线性无关的特征向量，则\alpha_1,\alpha_2,\dots,\alpha_s,\beta_1,\beta_2,\dots,\beta_r线性无关。</p>
+<p>3、定理3：设\lambda_1,\lambda_2,\dots,\lambda_m是数域K上n级矩阵A的不同的特征值，\alpha_{j1},\dots,\alpha_{jr_j}是A的属于\lambda_j的线性无关的特征向量，j=1,2,\dots,m。则向量组</p>
+<p>\alpha_{11},\dots,\alpha_{ar_1},\dots\dots,\alpha_{m1},\dots,\alpha_{mr_m}
+</p>
+<p>线性无关。</p>
+<p>推论1：n级矩阵A的属于不同特征值的特征向量是线性无关的。</p>
+<p>4、定理4：数域K上n级矩阵A可对角化的充分必要条件是：A的属于不同特征值的特征子空间的维数之和等于n。</p>
+<p>推论2：数域K上n级矩阵A如果有n个不同的特征值，那么A可对角化。</p>
+<p>5、定理5：数域K上n级矩阵A可对角化的充分必要条件是：A的特征多项式的全部复根都属于K，并且A的每个特征值的几何重数等于它的代数重数。</p>
+<h3 id="5-7-实对称矩阵的对角化">5.7 实对称矩阵的对角化</h3>
+<p>1、定义1：实数域上的矩阵简称为实对称矩阵。</p>
+<p>定理1：实对称矩阵的特征多项式的每一个复根都是实数，从而它们都是特征值。</p>
+<p>2、定理2：实对称矩阵A的属于不同特征值的特征向量是正交的。</p>
+<p>3、定义2：如果对于n级实矩阵A、B，存在一个n级正交矩阵T，使得T^{-1}AT=B，那么称A<strong>正交相似</strong>于B。</p>
+<p>定理3：实对称矩阵一定正交相似于对角矩阵。</p>
+<p>命题1：如果n级实矩阵A正交相似于一个对角矩阵D，那么A一定是对称矩阵。</p>
+<p>命题2：两个n级实对称矩阵正交相似的充分必要条件是它们相似。</p>
+<h2 id="6-二次型-cdot矩阵的合同">6 二次型\cdot矩阵的合同</h2>
+<h3 id="6-1-二次型及其标准形">6.1 二次型及其标准形</h3>
+<p>1、定义1：数域K上一个<strong>n元二次型</strong>是系数在K中的n个变量的二次齐次多项式，它的一般形式是</p>
+<p>\begin{aligned}
+&f(x_1,x_2,\dots,x_n)=&a_{11}x_1^2+2a_{12}x_1x_2+2a_{13}x_1x_3+\cdots+2a_{1n}x_1x_n&\\
+&&+a_{22}x_2^2+2a_{23}x_2x_3+\cdots+2a_{2n}x_2x_n&\\
+&&+\cdots\qquad\cdots\qquad\cdots\qquad&\\
+&&+a_{nn}x_n^2
+\end{aligned}\tag{1}
+</p>
+<p>(1)式也可以写成</p>
+<p>f(x_1,x_2,\dots,x_n)=\sum_{i=1}^n\sum_{j=1}^na_{ij}x_ix_j,\tag{2}
+</p>
+<p>其中a_{ij}=a_{ji},1\leqslant i,j\leqslant n。把（2）式中的系数按原来顺序排成一个n级矩阵A：</p>
+<p>A=\begin{bmatrix} 
+a_{11}&a_{12}&a_{13}&\cdots&a_{1n}\\
+a_{21}&a_{22}&a_{23}&\cdots&a_{2n}\\
+\vdots&\vdots&\vdots&&\vdots\\
+a_{n1}&a_{n2}&a_{n3}&\cdots&a_{nn}
+\end{bmatrix},\tag{3}
+</p>
+<p>则称A是<strong>二次型f(x_1,x_2,\dots,x_n)的矩阵</strong>，它是对称矩阵。显然二次型f(x_1,x_2,\dots,x_n)的矩阵是唯一的。令</p>
+<p>X=\begin{bmatrix}x_1\\x_2\\\vdots\\x_n \end{bmatrix},\tag{4}
+</p>
+<p>则二次型（1）可写成</p>
+<p>f(x_1,x_2,\dots,x_n)=X'AX,\tag{5}
+</p>
+<p>其中A是二次型f(x_1,x_2,\dots,x_n)的矩阵。</p>
+<p>令Y=(y_1,y_2,\cdots,y_n)'，设C是数域K上的n级可逆矩阵，则关系式</p>
+<p>X=CY\tag{6}
+</p>
+<p>称为变量x_1,x_2,\dots,x_n到变量y_1,y_2,\cdots,y_n的一个<strong>非退化线性变换</strong>。</p>
+<p>2、定义2：数域K上两个n元二次型X'AX与Y'BY，如果存在一个非退化线性变换X=CY，把X'AX变成Y'BY，那么称二次型X'AX与Y'BY<strong>等价</strong>，记作：X'AX\cong Y'BY。</p>
+<p>3、定义3：数域K上两个n级矩阵A与B，如果存在K上一个n级可逆矩阵C，使得</p>
+<p>C'AC=B,\tag{7}
+</p>
+<p>那么称A与B<strong>合同</strong>，记作：A\backsimeq B。</p>
+<p>4、命题1：数域K上两个n元二次型X'AX与Y'BY等价当且仅当n级对称矩阵A与B合同。</p>
+<p>5、合同关系下，A的等价类称为A的<strong>合同类</strong>。</p>
+<p>6、如果二次型X'AX等价于一个只含平方项的二次型，那么这个只含平方项的二次型称为X'AX的一个<strong>标准形</strong>。</p>
+<p>7、如果对称矩阵A合同于一个对角矩阵，那么这个对角矩阵称为A的一个<strong>合同标准形</strong>。</p>
+<p>8、命题2：实数域上n元二次型X'AX有一个标准形为</p>
+<p>\lambda_1y_1^2+\lambda_2y_2^2+\cdots+\lambda_ny_n^2,\tag{8}
+</p>
+<p>其中\lambda_1,\lambda_2,\cdots,\lambda_n是A的全部特征值。</p>
+<p>9、如果T是正交矩阵，那么变量的替换X=TX称为<strong>正交替换</strong>。</p>
+<p>10、引理1：设A、B都是数域K上n级矩阵，则A合同于B当且仅当A经过一系类成对初等行、列变换可以变成B，此时对I只作其中的初等列变换得到的可逆矩阵C，就使得C'AC=B。</p>
+<p>定理1：数域K上任一对称矩阵都合同于一个对角矩阵。</p>
+<p>11、定理2：数域K上任一n元二次型都等价于一个只含平方项的二次型。</p>
+<p>命题3：数域K上n元二次型X'AX的任一标准形中，系数不为0的平方项个数等于它的矩阵A的秩，这个秩也称为<strong>二次型X'AX的秩</strong>。</p>
+<h3 id="6-2-实二次型的规范型">6.2 实二次型的规范型</h3>
+<p>n元二次型X'AX经过一个适当的非退化线性替换X=CY可以化成下述形式的标准形：</p>
+<p>d_1y_1^2+\cdots+d_py_p^2-d_{p+1}y_{p+1}^2-\cdots-d_ry_r^2,\tag{1}
+</p>
+<p>其中d_i>0,i=1,2,\cdots,r。易知这个二次型的秩为r。再作一个非退化线性替换：</p>
+<p>\begin{aligned}
+y_i&=\frac 1 {\sqrt{d_i}}z_i,\qquad i=1,2,\cdots,r.\\
+y_j&=z_j,\qquad j=r+1,\cdots,n.
+\end{aligned}\tag{2}
+</p>
+<p>则二次型（1）可变成</p>
+<p>z_1^2+\cdots+z_p^2-z_{p+1}^2-\cdots-z_r^2.\tag{3}
+</p>
+<p>因此二次型X'AX有形如（2）式的一个标准形，称它为二次型X'AX的<strong>规范形</strong>，它的特征是：只含平方项，且平方项的系数为1.-1或0；系数为1的平方项都在前面。实二次型X'AX的规范形（2）被两个自然数p和r决定。</p>
+<p>若X'AX为复二次型，由于复数域负数可开根号，在经过形如（2）式的非线性退化过程可消去每项的正负性，从而得到下述形式标准形：</p>
+<p>z_1^2+z_2^2+\cdots+z_r^2.\tag{4}
+</p>
+<p>把这个标准形叫做复二次型X'AX的规范形。它的特征是：只含平方项，且平方项的系数为1或0.显然，复二次型X'AX的规范形完全由它的秩决定。</p>
+<p>1、定理1（惯性定理）：n元实二次型X'AX的规范形是唯一的。</p>
+<p>2、定义1：在实二次型X'AX的规范形中，系数为+1的平方项个数为p称为X'AX的<strong>正惯性指数</strong>，系数为-1的平方项个数r-1称为X'AX的<strong>负惯性指数</strong>；正惯性指数减去负惯性指数所得的差2p-r称为X'AX的<strong>符号差</strong>。</p>
+<p>命题1：两个n元实二次型等价</p>
+<p>\begin{aligned}
+\iff&它们的规范形相同\\
+\iff&它们的秩相等，并且正惯性指数也相等。
+\end{aligned}
+</p>
+<p>推论1：任一n级实对称矩阵A合同于对角矩阵diag\{1,\cdots,1,-1,\cdots,-1,0,\cdots,0\}，其中1的个数等于X'AX的正惯性指数，-1的个数等于X'AX的负惯性指数（分别把它们称为A的正惯性指数和负惯性指数），这个对角矩阵称为A的<strong>合同规范形</strong>。</p>
+<p>推论2：两个n级实对称矩阵合同等价于：它们的秩相等，并且正惯性指数也相等。秩和正惯性指数是合同关系下的一组完全不变量。</p>
+<p>3、定理2：复二次型X'AX的规范形是唯一的。</p>
+<p>命题2：两个n元复二次型等价</p>
+<p>\begin{aligned}
+\iff&它们的规范形相同\\
+\iff&它们的秩相等。
+\end{aligned}
+</p>
+<p>推论3：任一n级复对称矩阵A合同于对角阵：</p>
+<p>\begin{pmatrix}I_r&0\\0&0 \end{pmatrix},
+</p>
+<p>其中r=rank(A)。</p>
+<p>推论4：两个n级复对称矩阵合同等价于：它们的秩相等。</p>
+<h3 id="6-3-正定二次型与正定矩阵">6.3 正定二次型与正定矩阵</h3>
+<p>1、定义1：实二次型X'AX称为<strong>正定</strong>的，如果对于R^n中任意非零列向量\alpha，都有\alpha 'A\alpha>0。</p>
+<p>2、定理1：n元实二次型X'AX是正定的当且仅当它的正惯性指数等于n。</p>
+<p>推论1：n元实二次型X'AX​是正定的</p>
+<p>\begin{aligned}
+\iff&它的规范形为：y_1^2+y_2^2+\cdots+y_n^2\\
+\iff&它的标准形中n个系数全大于0
+\end{aligned}
+</p>
+<p>3、定义2：实对称矩阵A称为正定的，如果实二次型X'AX是正定的。即对于R^n中任意非零列向量\alpha，有\alpha 'A\alpha>0。</p>
+<p>4、定理2：n级实对称矩阵A是正定的</p>
+<p>\begin{aligned}
+\iff&A的正惯性指数等于n\\
+\iff&A\backsimeq I\\
+\iff&A的合同标准形中主对角元全大于0\\
+\iff&A的特征值全大于0
+\end{aligned}
+</p>
+<p>推论2：与正定矩阵合同的实对称矩阵也是正定矩阵。</p>
+<p>推论3：与正定二次型等价的实二次型也是正定的，从而非退化线性替换不改变实二次型的正定性。</p>
+<p>推论4：正定矩阵的行列式大于0.</p>
+<p>5、定理3：实对称矩阵A是正定的充分必要条件是：A的所有顺序主子式全大于0。</p>
+<p>推论5：实二次型X'AX是正定的充分必要条件是：A的所有顺序主子式全大于0。</p>
+<p>6、定义3：n元实二次型X'AX称为是**半正定（负定，半负定）**的，如果对于R^n中任意非零列向量\alpha，有</p>
+<p>\alpha 'A\alpha\geqslant0(\alpha 'A\alpha<0,\alpha 'A\alpha\leqslant0)
+</p>
+<p>如果X'AX既不是半正定的，又不是半负定的，那么称它是<strong>不定的</strong>。</p>
+<p>定义4：实对称矩阵A称为**半正定（负定，半负定，不定）<strong>的，如果实二次型X'AX是</strong>半正定（负定，半负定，不定）**的。</p>
+<p>7、定理4：</p>
+<p>\begin{aligned}
+&(1)n元实二次型X'AX是半正定的\\
+\iff &(2)它的正惯性指数等于它的秩\\
+\iff&(3)它的规范形是y_1^2+y_2^2+\cdots+y_n^2(0\leqslant r\leqslant n)\\
+\iff&(4)它的标准形中n个系数全非负。
+\end{aligned}
+</p>
+<p>推论6：</p>
+<p>\begin{aligned}
+&实对称矩阵A是半正定的\\
+\iff&A\backsimeq \begin{pmatrix}I_r&0\\0&0\end{pmatrix}，其中r=rank(A)\\
+\iff&A的合同标准形中n个系数全非负\\
+\iff&A的特征值全非负。
+\end{aligned}
+</p>
+<p>8、定理5：实对称矩阵A是半正定的当且仅当A的所有主子式全非负。</p>
+<p>9、定理6：实对称矩阵A负定的充分必要条件是：它的奇数阶顺序主子式全小于0，偶数阶顺序主子式全大于0。</p>
+<p>10、何塞矩阵（略）。</p>
+</article><div class="post-copyright"><div class="post-copyright__author_group"><div class="post-copyright__author_img"><img class="post-copyright__author_img_front" src= "/img/loading.gif" data-lazy-src="/%5Bobject%20Object%5D"></div><div class="post-copyright__author_name">Shane Hu</div><div class="post-copyright__author_desc">Welcome, friends!</div></div><div class="post-tools" id="post-tools"><div class="post-tools-left"><div id="quit-box" onclick="RemoveRewardMask()"></div></div></div><div class="social-share"><a class="social-share-ico icon-qq" target="_blank" rel="noopener" href="https://connect.qq.com/widget/shareqq/index.html?url=https%3A%2F%2Fhs3434.github.io%2Fhs3434.github.io%2F2024%2F06%2F04%2FAdvanced-Algebra%2F&amp;title=%E9%AB%98%E7%AD%89%E4%BB%A3%E6%95%B0%EF%BC%88%E4%B8%8A%EF%BC%89%E4%B8%98%E7%BB%B4%E5%A3%B0%20%E7%AC%94%E8%AE%B0&amp;desc=undefined&amp;summary=undefined&amp;site=%E9%AB%98%E7%AD%89%E4%BB%A3%E6%95%B0%EF%BC%88%E4%B8%8A%EF%BC%89%E4%B8%98%E7%BB%B4%E5%A3%B0%20%E7%AC%94%E8%AE%B0&amp;pics=2024%2F06%2F04%2FAdvanced-Algebra%2Fimage.png" title="Share to QQ"><i class="solitude fab fa-qq"></i></a><a class="social-share-ico icon-weibo" target="_blank" rel="noopener" href="http://service.weibo.com/share/share.php?url=https%3A%2F%2Fhs3434.github.io%2Fhs3434.github.io%2F2024%2F06%2F04%2FAdvanced-Algebra%2F&amp;title=%E9%AB%98%E7%AD%89%E4%BB%A3%E6%95%B0%EF%BC%88%E4%B8%8A%EF%BC%89%E4%B8%98%E7%BB%B4%E5%A3%B0%20%E7%AC%94%E8%AE%B0&amp;pic=2024%2F06%2F04%2FAdvanced-Algebra%2Fimage.png" title="Share to Weibo"><i class="solitude fab fa-weibo"></i></a><a class="social-share-ico icon-twitter" target="_blank" rel="noopener" href="https://twitter.com/intent/tweet?url=https%3A%2F%2Fhs3434.github.io%2Fhs3434.github.io%2F2024%2F06%2F04%2FAdvanced-Algebra%2F&amp;text=%E9%AB%98%E7%AD%89%E4%BB%A3%E6%95%B0%EF%BC%88%E4%B8%8A%EF%BC%89%E4%B8%98%E7%BB%B4%E5%A3%B0%20%E7%AC%94%E8%AE%B0" title="Share to Twitter"><i class="solitude fab fa-twitter"></i></a><a class="social-share-ico icon-facebook" target="_blank" rel="noopener" href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fhs3434.github.io%2Fhs3434.github.io%2F2024%2F06%2F04%2FAdvanced-Algebra%2F" title="Share to Facebook"><i class="solitude fab fa-facebook"></i></a><a class="social-share-ico icon-telegram" target="_blank" rel="noopener" href="https://t.me/share/url?url=https%3A%2F%2Fhs3434.github.io%2Fhs3434.github.io%2F2024%2F06%2F04%2FAdvanced-Algebra%2F&amp;text=%E9%AB%98%E7%AD%89%E4%BB%A3%E6%95%B0%EF%BC%88%E4%B8%8A%EF%BC%89%E4%B8%98%E7%BB%B4%E5%A3%B0%20%E7%AC%94%E8%AE%B0" title="Share to Telegram"><i class="solitude fab fa-telegram"></i></a><a class="social-share-ico icon-whatsapp" target="_blank" rel="noopener" href="https://api.whatsapp.com/send?text=%E9%AB%98%E7%AD%89%E4%BB%A3%E6%95%B0%EF%BC%88%E4%B8%8A%EF%BC%89%E4%B8%98%E7%BB%B4%E5%A3%B0%20%E7%AC%94%E8%AE%B0 https%3A%2F%2Fhs3434.github.io%2Fhs3434.github.io%2F2024%2F06%2F04%2FAdvanced-Algebra%2F" title="Share to WhatsApp"><i class="solitude fab fa-whatsapp"></i></a><a class="social-share-ico icon-linkedin" target="_blank" rel="noopener" href="https://www.linkedin.com/shareArticle?mini=true&amp;url=https%3A%2F%2Fhs3434.github.io%2Fhs3434.github.io%2F2024%2F06%2F04%2FAdvanced-Algebra%2F&amp;title=%E9%AB%98%E7%AD%89%E4%BB%A3%E6%95%B0%EF%BC%88%E4%B8%8A%EF%BC%89%E4%B8%98%E7%BB%B4%E5%A3%B0%20%E7%AC%94%E8%AE%B0&amp;summary=undefined&amp;source=%E9%AB%98%E7%AD%89%E4%BB%A3%E6%95%B0%EF%BC%88%E4%B8%8A%EF%BC%89%E4%B8%98%E7%BB%B4%E5%A3%B0%20%E7%AC%94%E8%AE%B0" title="Share to LinkedIn"><i class="solitude fab fa-linkedin"></i></a></div><div class="post-copyright__notice"><span class="post-copyright-info">This piece of writing is an original article, utilizing the<a target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh">CC BY-NC-SA 4.0</a>Agreement. For complete reproduction, please acknowledge the source as Courtesy of<a href="/">Blog of Shane Hu</a></span></div></div><div class="post-tools-right"><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/algebra/"><span class="tags-punctuation"><i class="solitude fas fa-hashtag"></i>algebra<span class="tagsPageCount">1</span></span></a><a class="post-meta__tags" href="/tags/mathematics/"><span class="tags-punctuation"><i class="solitude fas fa-hashtag"></i>mathematics<span class="tagsPageCount">1</span></span></a></div></div></div><nav class="needEndHide pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2024/06/05/udesk1/"><div class="pagination-info"><div class="label">Previous</div><div class="prev_info">通过 python 使用 api 抓取 udesk 客服系统数据并同步到本地 mysql 数据库</div></div></a></div><div class="next-post pull-right"><a href="/2024/06/04/server/"><div class="pagination-info"><div class="label">Next</div><div class="next_info">服务器基础配置</div></div></a></div></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="card-content"><div class="card-info-avatar is-center"><div class="top-group"><div class="sayhi" id="sayhi" onclick="sco.changeWittyWord()"></div></div></div><div class="avatar"><img alt="Avatar" src= "/img/loading.gif" data-lazy-src="/img/logo.png"></div><div class="description"></div><div class="bottom-group"><span class="left"><div class="name">Shane Hu</div><div class="desc">只有迎风，风筝才能飞得更高。</div></span><div class="social-icons is-center"></div></div></div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="solitude fas fa-bars"></i><span>Table of contents</span></div><div class="toc-content" id="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link"><span class="toc-text">高等代数（上）</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E7%BA%BF%E6%80%A7%E6%96%B9%E7%A8%8B%E7%BB%84%E7%9A%84%E8%A7%A3%E6%B3%95"><span class="toc-text">1 线性方程组的解法</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-1-%E8%A7%A3%E7%BA%BF%E6%80%A7%E6%96%B9%E7%A8%8B%E7%BB%84%E7%9A%84%E7%9F%A9%E9%98%B5%E6%B6%88%E5%85%83%E6%B3%95"><span class="toc-text">1.1 解线性方程组的矩阵消元法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-2%E7%BA%BF%E6%80%A7%E6%96%B9%E7%A8%8B%E7%BB%84%E7%9A%84%E8%A7%A3%E7%9A%84%E6%83%85%E5%86%B5%E5%8F%8A%E5%85%B6%E5%88%A4%E5%88%AB%E5%87%86%E5%88%99"><span class="toc-text">1.2线性方程组的解的情况及其判别准则</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-3-%E6%95%B0%E5%9F%9F"><span class="toc-text">1.3 数域</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E8%A1%8C%E5%88%97%E5%BC%8F"><span class="toc-text">2 行列式</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2-1-n%E5%85%83%E6%8E%92%E5%88%97"><span class="toc-text">2.1 n元排列</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-2-n%E9%98%B6%E8%A1%8C%E5%88%97%E5%BC%8F%E7%9A%84%E5%AE%9A%E4%B9%89"><span class="toc-text">2.2 n阶行列式的定义</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-3-%E8%A1%8C%E5%88%97%E5%BC%8F%E7%9A%84%E6%80%A7%E8%B4%A8"><span class="toc-text">2.3 行列式的性质</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-4-%E8%A1%8C%E5%88%97%E5%BC%8F%E6%8C%89%E4%B8%80%E8%A1%8C%EF%BC%88%E5%88%97%EF%BC%89%E5%B1%95%E5%BC%80"><span class="toc-text">2.4 行列式按一行（列）展开</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-5-%E5%85%8B%E8%8E%B1%E5%A7%86-Cramer-%E6%B3%95%E5%88%99"><span class="toc-text">2.5 克莱姆(Cramer)法则</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-6-%E8%A1%8C%E5%88%97%E5%BC%8F%E6%8C%89k%E8%A1%8C%EF%BC%88%E5%88%97%EF%BC%89%E5%B1%95%E5%BC%80"><span class="toc-text">2.6 行列式按k行（列）展开</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-%E7%BA%BF%E6%80%A7%E6%96%B9%E7%A8%8B%E7%BB%84%E7%9A%84%E8%A7%A3%E9%9B%86%E7%9A%84%E7%BB%93%E6%9E%84"><span class="toc-text">3 线性方程组的解集的结构</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#3-1-n%E7%BB%B4%E5%90%91%E9%87%8F%E7%A9%BA%E9%97%B4K-n"><span class="toc-text">3.1 n维向量空间K^n</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-2-%E7%BA%BF%E6%80%A7%E7%9B%B8%E5%85%B3%E4%B8%8E%E7%BA%BF%E6%80%A7%E6%97%A0%E5%85%B3%E7%9A%84%E5%90%91%E9%87%8F%E7%BB%84"><span class="toc-text">3.2 线性相关与线性无关的向量组</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-3-%E5%90%91%E9%87%8F%E7%BB%84%E7%9A%84%E7%A7%A9"><span class="toc-text">3.3 向量组的秩</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-4-%E5%AD%90%E7%A9%BA%E9%97%B4%E7%9A%84%E5%9F%BA%E4%B8%8E%E7%BB%B4%E6%95%B0"><span class="toc-text">3.4 子空间的基与维数</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-5-%E7%9F%A9%E9%98%B5%E7%9A%84%E7%A7%A9"><span class="toc-text">3.5 矩阵的秩</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-6-%E7%BA%BF%E6%80%A7%E6%96%B9%E7%A8%8B%E7%BB%84%E6%9C%89%E8%A7%A3%E7%9A%84%E5%85%85%E5%88%86%E5%BF%85%E8%A6%81%E6%9D%A1%E4%BB%B6"><span class="toc-text">3.6 线性方程组有解的充分必要条件</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-7-%E9%BD%90%E6%AC%A1%E7%BA%BF%E6%80%A7%E6%96%B9%E7%A8%8B%E7%BB%84%E7%9A%84%E8%A7%A3%E9%9B%86%E7%9A%84%E7%BB%93%E6%9E%84"><span class="toc-text">3.7 齐次线性方程组的解集的结构</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-8-%E9%9D%9E%E9%BD%90%E6%AC%A1%E7%BA%BF%E6%80%A7%E6%96%B9%E7%A8%8B%E7%BB%84%E7%9A%84%E8%A7%A3%E9%9B%86%E7%9A%84%E7%BB%93%E6%9E%84"><span class="toc-text">3.8 非齐次线性方程组的解集的结构</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-%E7%9F%A9%E9%98%B5%E7%9A%84%E8%BF%90%E7%AE%97"><span class="toc-text">4 矩阵的运算</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#4-1-%E7%9F%A9%E9%98%B5%E7%9A%84%E8%BF%90%E7%AE%97"><span class="toc-text">4.1 矩阵的运算</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-2-%E7%89%B9%E6%AE%8A%E7%9F%A9%E9%98%B5"><span class="toc-text">4.2 特殊矩阵</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-3-%E7%9F%A9%E9%98%B5%E4%B9%98%E7%A7%AF%E7%9A%84%E7%A7%A9%E4%B8%8E%E8%A1%8C%E5%88%97%E5%BC%8F"><span class="toc-text">4.3 矩阵乘积的秩与行列式</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-4-%E5%8F%AF%E9%80%86%E7%9F%A9%E9%98%B5"><span class="toc-text">4.4 可逆矩阵</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-5-%E7%9F%A9%E9%98%B5%E7%9A%84%E5%88%86%E5%9D%97"><span class="toc-text">4.5 矩阵的分块</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-6-%E6%AD%A3%E4%BA%A4%E7%9F%A9%E9%98%B5-cdot%E6%AC%A7%E5%87%A0%E9%87%8C%E5%BE%97%E7%A9%BA%E9%97%B4R-n"><span class="toc-text">4.6 正交矩阵\cdot欧几里得空间R^n</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-7-%E4%BB%8EK-n%E5%88%B0K-s%E7%9A%84%E7%BA%BF%E6%80%A7%E6%98%A0%E5%B0%84"><span class="toc-text">4.7 从K^n到K^s的线性映射</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-%E7%9F%A9%E9%98%B5%E7%9A%84%E7%9B%B8%E6%8A%B5%E4%B8%8E%E7%9B%B8%E4%BC%BC"><span class="toc-text">5 矩阵的相抵与相似</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#5-1-%E7%AD%89%E4%BB%B7%E5%85%B3%E7%B3%BB%E4%B8%8E%E9%9B%86%E5%90%88%E7%9A%84%E5%88%92%E5%88%86"><span class="toc-text">5.1 等价关系与集合的划分</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-2-%E7%9F%A9%E9%98%B5%E7%9A%84%E7%9B%B8%E6%8A%B5"><span class="toc-text">5.2 矩阵的相抵</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-3-%E5%B9%BF%E4%B9%89%E9%80%86%E7%9F%A9%E9%98%B5"><span class="toc-text">5.3 广义逆矩阵</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-4-%E7%9F%A9%E9%98%B5%E7%9A%84%E7%9B%B8%E4%BC%BC"><span class="toc-text">5.4 矩阵的相似</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-5-%E7%9F%A9%E9%98%B5%E7%9A%84%E7%89%B9%E5%BE%81%E5%80%BC%E5%92%8C%E7%89%B9%E5%BE%81%E5%90%91%E9%87%8F"><span class="toc-text">5.5 矩阵的特征值和特征向量</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-6-%E7%9F%A9%E9%98%B5%E5%8F%AF%E5%AF%B9%E8%A7%92%E5%8C%96%E7%9A%84%E6%9D%A1%E4%BB%B6"><span class="toc-text">5.6 矩阵可对角化的条件</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-7-%E5%AE%9E%E5%AF%B9%E7%A7%B0%E7%9F%A9%E9%98%B5%E7%9A%84%E5%AF%B9%E8%A7%92%E5%8C%96"><span class="toc-text">5.7 实对称矩阵的对角化</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#6-%E4%BA%8C%E6%AC%A1%E5%9E%8B-cdot%E7%9F%A9%E9%98%B5%E7%9A%84%E5%90%88%E5%90%8C"><span class="toc-text">6 二次型\cdot矩阵的合同</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#6-1-%E4%BA%8C%E6%AC%A1%E5%9E%8B%E5%8F%8A%E5%85%B6%E6%A0%87%E5%87%86%E5%BD%A2"><span class="toc-text">6.1 二次型及其标准形</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#6-2-%E5%AE%9E%E4%BA%8C%E6%AC%A1%E5%9E%8B%E7%9A%84%E8%A7%84%E8%8C%83%E5%9E%8B"><span class="toc-text">6.2 实二次型的规范型</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#6-3-%E6%AD%A3%E5%AE%9A%E4%BA%8C%E6%AC%A1%E5%9E%8B%E4%B8%8E%E6%AD%A3%E5%AE%9A%E7%9F%A9%E9%98%B5"><span class="toc-text">6.3 正定二次型与正定矩阵</span></a></li></ol></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="solitude fas fa-map"></i><span>New posts</span></div><div class="aside-list"><a class="aside-list-item" href="/2025/03/06/250306/" title="vscode 打开powershell出现编码报错问题解决"><div class="thumbnail"><img alt="vscode 打开powershell出现编码报错问题解决" src= "/img/loading.gif" data-lazy-src="/img/default.png"></div><div class="content"><span class="title" href="/2025/03/06/250306/" title="vscode 打开powershell出现编码报错问题解决">vscode 打开powershell出现编码报错问题解决</span><span class="categories" href="/2025/03/06/250306/">vscode</span></div></a><a class="aside-list-item" href="/2025/03/03/transformer1/" title="tansformer 从入门到上手只需要看这一篇"><div class="thumbnail"><img alt="tansformer 从入门到上手只需要看这一篇" src= "/img/loading.gif" data-lazy-src="/img/default.png"></div><div class="content"><span class="title" href="/2025/03/03/transformer1/" title="tansformer 从入门到上手只需要看这一篇">tansformer 从入门到上手只需要看这一篇</span><span class="categories" href="/2025/03/03/transformer1/">AI</span></div></a><a class="aside-list-item" href="/2024/06/20/2406202/" title="使用 dnscrypt-proxy 解决 dns 被劫持污染问题"><div class="thumbnail"><img alt="使用 dnscrypt-proxy 解决 dns 被劫持污染问题" src= "/img/loading.gif" data-lazy-src="/img/default.png"></div><div class="content"><span class="title" href="/2024/06/20/2406202/" title="使用 dnscrypt-proxy 解决 dns 被劫持污染问题">使用 dnscrypt-proxy 解决 dns 被劫持污染问题</span><span class="categories" href="/2024/06/20/2406202/">jottings</span></div></a><a class="aside-list-item" href="/2024/06/20/240620/" title="debian 使用 dnscrypt-proxy 后 53 端口被  1/init systemd 占用问题"><div class="thumbnail"><img alt="debian 使用 dnscrypt-proxy 后 53 端口被  1/init systemd 占用问题" src= "/img/loading.gif" data-lazy-src="/img/default.png"></div><div class="content"><span class="title" href="/2024/06/20/240620/" title="debian 使用 dnscrypt-proxy 后 53 端口被  1/init systemd 占用问题">debian 使用 dnscrypt-proxy 后 53 端口被  1/init systemd 占用问题</span><span class="categories" href="/2024/06/20/240620/">jottings</span></div></a><a class="aside-list-item" href="/2024/06/19/240619/" title="HTTP Status 307缓存的处理"><div class="thumbnail"><img alt="HTTP Status 307缓存的处理" src= "/img/loading.gif" data-lazy-src="/img/default.png"></div><div class="content"><span class="title" href="/2024/06/19/240619/" title="HTTP Status 307缓存的处理">HTTP Status 307缓存的处理</span><span class="categories" href="/2024/06/19/240619/">jottings</span></div></a></div></div></div></div></main><footer id="footer"><div id="st-footer-bar"><div class="footer-logo"><span>主页</span></div><div class="footer-bar-description">来自 Shane Hu 的文章</div><a class="footer-bar-link" href="/about/">了解更多</a></div><div id="footer-bar"><div class="footer-bar-links"><div class="footer-bar-left"><div class="copyright">© 2024 - 2025 By&nbsp;<a class="footer-bar-link" href="/"><img class="author-avatar" src= "/img/loading.gif" data-lazy-src="/img/pwa/favicon.ico">Shane Hu</a></div><div class="beian-group"><a class="footer-bar-link" target="_blank" rel="noopener" href="https://hexo.io/">Framework: Hexo</a><a class="footer-bar-link" target="_blank" rel="noopener" href="https://github.com/everfu/hexo-theme-solitude">Theme: Solitude</a></div></div><div class="footer-bar-right"><a class="footer-bar-link" target="_blank" rel="noopener" href="https://github.com/valor-x/hexo-theme-solitude" alt="主题">主题</a></div></div></div></footer></div><!-- right_menu--><!-- inject body--><div><script src="/js/utils.js?v=3.0.14"></script><script src="/js/main.js?v=3.0.14"></script><script src="/js/third_party/waterfall.min.js?v=3.0.14"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/pjax/0.2.8/pjax.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/11.4.1/mermaid.min.js"></script><script src="/js/third_party/universe.min.js?v=3.0.14"></script><script>dark()
+</script><script src="/js/tw_cn.js?v=3.0.14"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-lazyload/19.1.3/lazyload.iife.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/node-snackbar/0.1.16/snackbar.min.js"></script><script>window.paceOptions = {
+  restartOnPushState: false
+}
+
+utils.addGlobalFn('pjaxSend', () => {
+  Pace.restart()
+}, 'pace_restart')
+</script><script src="https://cdnjs.cloudflare.com/ajax/libs/pace/1.2.4/pace.min.js"></script><div class="js-pjax"><script>mermaid.run();
+</script></div></div><!-- pjax--><script>const pjax = new Pjax({
+    elements: 'a:not([target="_blank"])',
+    selectors: ["title","#body-wrap","#site-config","meta[name=\"description\"]",".js-pjax","meta[property^=\"og:\"]","#config-diff",".rs_show",".rs_hide"],
+    cacheBust: false,
+    analytics: false,
+    scrollRestoration: false
+})
+
+document.querySelectorAll('script[data-pjax]').forEach(item => {
+    const newScript = document.createElement('script')
+    const content = item.text || item.textContent || item.innerHTML || ""
+    Array.from(item.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value))
+    newScript.appendChild(document.createTextNode(content))
+    item.parentNode.replaceChild(newScript, item)
+})
+
+document.addEventListener('pjax:complete', () => {
+    window.refreshFn()
+
+    document.querySelectorAll('script[data-pjax]').forEach(item => {
+        const newScript = document.createElement('script')
+        const content = item.text || item.textContent || item.innerHTML || ""
+        Array.from(item.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value))
+        newScript.appendChild(document.createTextNode(content))
+        item.parentNode.replaceChild(newScript, item)
+    })
+
+    GLOBAL_CONFIG.islazyload && window.lazyLoadInstance.update()
+
+})
+
+document.addEventListener('pjax:error', (e) => {
+    if (e.request.status === 404) {
+        pjax.loadUrl('/404.html')
+    }
+})</script><!-- google adsense--><!-- search--><!-- music--></body></html>
+        <script>
+            const posts = ["2025/03/06/250306/","2025/03/03/transformer1/","2024/06/20/2406202/","2024/06/20/240620/","2024/06/19/240619/","2024/06/06/Dante/","2024/06/06/solitude/","2024/06/05/udesk2/","2024/06/05/udesk1/","2024/06/04/Advanced-Algebra/","2024/06/04/server/","2024/06/04/font/","2024/06/04/ydns/","2024/06/04/conda/","2024/06/04/bind9/","2024/06/04/openwrt/","2024/06/04/ssl/","2024/06/03/hexo/"];
+            function toRandomPost() {
+                const randomPost = posts[Math.floor(Math.random() * posts.length)];
+                pjax.loadUrl(GLOBAL_CONFIG.root + randomPost);
+            }
+        </script>

@@ -1,0 +1,224 @@
+<!DOCTYPE html><html lang="en" data-theme="light"><head><meta charset="utf-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1"><title>服务器基础配置 | Blog of Shane Hu</title><noscript>Please enable JavaScript to view the site</noscript><link rel="icon" href="/img/pwa/favicon.ico"><!-- index.css--><link rel="stylesheet" href="/css/index.css?v=3.0.14"><!-- inject head--><link rel="canonical" href="https://hs3434.github.io/hs3434.github.io/2024/06/04/server/index.html"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"><!-- aplayer--><!-- swiper--><!-- fancybox ui--><!-- katex--><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.21/katex.min.css"><!-- Open Graph--><meta name="description" content="debian 12 国内源 Debian 的软件源配置文件是 &amp;#x2F;etc&amp;#x2F;apt&amp;#x2F;sources.list。可以先备份配置文件。 一般情况下，将&amp;#x2F;etc&amp;#x2F;apt&amp;#x2F;sources.list文件中Debian默认的软件仓库地址和安全更新仓库地址修改为国内的镜像地址即可， 比如将deb.debian.org"><!-- pwa--><meta name="apple-mobile-web-app-capable" content="Blog of Shane Hu"><meta name="theme-color" content="var(--efu-main)"><meta name="apple-mobile-web-app-status-bar-style" content="var(--efu-main)"><link rel="bookmark" href="/img/pwa/favicon.ico"><link rel="apple-touch-icon" href="/img/pwa/favicon.ico" sizes="180x180"><script>console.log(' %c Solitude %c ' + '3.0.14' + ' %c https://github.com/everfu/hexo-theme-solitude',
+    'background:#35495e ; padding: 1px; border-radius: 3px 0 0 3px;  color: #fff',
+    'background:#ff9a9a ; padding: 1px; border-radius: 0 3px 3px 0;  color: #fff',
+    'background:unset ; padding: 1px; border-radius: 0 3px 3px 0;  color: #fff')
+</script><script>(()=>{
+        const saveToLocal = {
+            set: function setWithExpiry(key, value, ttl) {
+                if (ttl === 0)
+                    return
+                const now = new Date()
+                const expiryDay = ttl * 86400000
+                const item = {
+                    value: value,
+                    expiry: now.getTime() + expiryDay
+                }
+                localStorage.setItem(key, JSON.stringify(item))
+            },
+            get: function getWithExpiry(key) {
+                const itemStr = localStorage.getItem(key)
+
+                if (!itemStr) {
+                    return undefined
+                }
+                const item = JSON.parse(itemStr)
+                const now = new Date()
+
+                if (now.getTime() > item.expiry) {
+                    localStorage.removeItem(key)
+                    return undefined
+                }
+                return item.value
+            }
+        };
+        window.utils = {
+            saveToLocal: saveToLocal,
+            getCSS: (url, id = false) => new Promise((resolve, reject) => {
+              const link = document.createElement('link')
+              link.rel = 'stylesheet'
+              link.href = url
+              if (id) link.id = id
+              link.onerror = reject
+              link.onload = link.onreadystatechange = function() {
+                const loadState = this.readyState
+                if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+                link.onload = link.onreadystatechange = null
+                resolve()
+              }
+              document.head.appendChild(link)
+            }),
+            getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+              const script = document.createElement('script')
+              script.src = url
+              script.async = true
+              script.onerror = reject
+              script.onload = script.onreadystatechange = function() {
+                const loadState = this.readyState
+                if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+                script.onload = script.onreadystatechange = null
+                resolve()
+              }
+
+              Object.keys(attr).forEach(key => {
+                script.setAttribute(key, attr[key])
+              })
+
+              document.head.appendChild(script)
+            }),
+            addGlobalFn: (key, fn, name = false, parent = window) => {
+                const globalFn = parent.globalFn || {}
+                const keyObj = globalFn[key] || {}
+
+                if (name && keyObj[name]) return
+
+                name = name || Object.keys(keyObj).length
+                keyObj[name] = fn
+                globalFn[key] = keyObj
+                parent.globalFn = globalFn
+            },
+            addEventListenerPjax: (ele, event, fn, option = false) => {
+              ele.addEventListener(event, fn, option)
+              utils.addGlobalFn('pjax', () => {
+                  ele.removeEventListener(event, fn, option)
+              })
+          },
+        }
+    })()</script><!-- theme--><script>initTheme = () => {
+    let isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches
+    const cachedMode = utils.saveToLocal.get('theme');
+    if (cachedMode === undefined) {
+        const nowMode =
+            isDarkMode ? 'dark' : 'light'
+        document.documentElement.setAttribute('data-theme', nowMode);
+    } else {
+        document.documentElement.setAttribute('data-theme', cachedMode);
+    }
+    typeof rm === 'object' && rm.mode(cachedMode === 'dark' && isDarkMode)
+}
+initTheme()</script><!-- global head--><script>const GLOBAL_CONFIG = {
+    root: '/',
+    algolia: undefined,
+    localsearch: undefined,
+    runtime: '2024-06-03 00:00:00',
+    lazyload: {
+        enable: true,
+        error: '/img/error_load.webp'
+    },
+    copyright: {"limit":50,"author":"Author: Shane Hu","link":"Link: ","source":"Source: Blog of Shane Hu","info":"Copyright is owned by the author. For commercial reprints, please contact the author for authorization. For non-commercial reprints, please indicate the source."},
+    highlight: {"limit":200,"expand":true,"copy":true,"syntax":"highlight.js"},
+    randomlink: false,
+    lang: {"theme":{"dark":"Dark","light":"Light"},"copy":{"success":"Copied","error":"Copy failed"},"backtop":"Back to top","time":{"day":" days ago","hour":" hours ago","just":"just","min":" minutes ago","month":" months ago"},"day":" days","f12":"Developer mode is turned on, please follow the GPL.","totalk":"You don't need to delete blank lines, just type in your comments."},
+    aside: {
+        state: {
+            morning: "✨ 早上好，新的一天开始了",
+            noon: "🍲 午餐时间",
+            afternoon: "🌞 下午好",
+            night: "早点休息",
+            goodnight: "晚安 😴",
+        },
+        witty_words: [],
+        witty_comment: {
+            prefix: 'Long time no see, ',
+            back: 'Welcome back again,',
+        },
+    },
+    covercolor: {
+        enable: false
+    },
+    comment: false,
+    lightbox: 'null',
+    right_menu: false,
+    translate: {"translateDelay":0,"defaultEncoding":2},
+    lure: false,
+    expire: false,
+};</script><!-- page-config head--><script id="config-diff">var PAGE_CONFIG = {
+    is_post: true,
+    is_page: false,
+    is_home: false,
+    page: '',
+    toc: true,
+    comment: false,
+    ai_text: false,
+    color: false,
+}</script><meta name="generator" content="Hexo 7.3.0"></head><body id="body"><!-- universe--><canvas id="universe"></canvas><!-- background img--><!-- loading--><!-- console--><!-- sidebar--><div id="sidebar" style="zoom: 1;"><div id="menu-mask" style="display: none;"></div><div id="sidebar-menus"><div class="site-data"><div class="data-item is-center"><div class="data-item-link"><a href="/archives/"><div class="headline">Archives</div><div class="length-num">18</div></a></div></div><div class="data-item is-center"><div class="data-item-link"><a href="/categories/"><div class="headline">Categories</div><div class="length-num">7</div></a></div></div><div class="data-item is-center"><div class="data-item-link"><a href="/tags/"><div class="headline">Tags</div><div class="length-num">27</div></a></div></div></div><span class="sidebar-menu-item-title">Function</span><div class="sidebar-menu-item"><span class="darkmode_switchbutton menu-child" onclick="sco.switchDarkMode()"><i class="solitude fas fa-circle-half-stroke"></i><span>Display mode</span></span></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="javascript:void(0);"><span>文库</span></a><ul class="menus_item_child"><li><a class="site-page child" href="/archives/"><i class="solitude  st-folder-fill"></i><span>文章列表</span></a></li><li><a class="site-page child" href="/categories/"><i class="solitude  st-checkbox-multiple-blank-fill"></i><span>全部分类</span></a></li><li><a class="site-page child" href="/tags/"><i class="solitude  st-price-tag-fill"></i><span>全部标签</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="javascript:void(0);"><span>关于我</span></a><ul class="menus_item_child"><li><a class="site-page child" href="/about/"><i class="solitude  st-contacts-fill"></i><span>自我介绍</span></a></li></ul></div></div><span class="sidebar-menu-item-title">Tags</span><div class="card-tags"><div class="card-tag-cloud"><a href="/tags/debian/">debian<sup>1</sup></a><a href="/tags/dns/">dns<sup>2</sup></a><a href="/tags/53port/">53port<sup>1</sup></a><a href="/tags/web/">web<sup>1</sup></a><a href="/tags/http/">http<sup>1</sup></a><a href="/tags/vscode-python-conda/">vscode python conda<sup>1</sup></a><a href="/tags/socks5/">socks5<sup>1</sup></a><a href="/tags/Dante/">Dante<sup>1</sup></a><a href="/tags/conda/">conda<sup>1</sup></a><a href="/tags/bind9/">bind9<sup>1</sup></a><a href="/tags/algebra/">algebra<sup>1</sup></a><a href="/tags/mathematics/">mathematics<sup>1</sup></a><a href="/tags/Fonts/">Fonts<sup>1</sup></a><a href="/tags/hexo/">hexo<sup>2</sup></a><a href="/tags/OpenWRT/">OpenWRT<sup>1</sup></a><a href="/tags/server/">server<sup>1</sup></a><a href="/tags/vps/">vps<sup>1</sup></a><a href="/tags/theme/">theme<sup>1</sup></a><a href="/tags/ssl/">ssl<sup>1</sup></a><a href="/tags/AI/">AI<sup>1</sup></a><a href="/tags/jottings/">jottings<sup>2</sup></a><a href="/tags/python/">python<sup>2</sup></a><a href="/tags/mysql/">mysql<sup>2</sup></a><a href="/tags/api/">api<sup>2</sup></a><a href="/tags/udesk/">udesk<sup>2</sup></a><a href="/tags/ydns/">ydns<sup>1</sup></a><a href="/tags/ddns/">ddns<sup>1</sup></a></div></div></div></div><!-- keyboard--><!-- righhtside--><div class="post" id="body-wrap"><header class="post-bg" id="page-header"><nav class="show" id="nav"><div id="nav-group"><div id="blog_name"><a id="site-name" href="/" title="Back to home"><span class="title">主页</span><i class="solitude fas fa-home"></i></a></div><div id="page-name-mask"><div id="page-name"><a id="page-name-text" onclick="sco.toTop()">服务器基础配置</a></div></div><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="javascript:void(0);"><span>文库</span></a><ul class="menus_item_child"><li><a class="site-page child" href="/archives/"><i class="solitude  st-folder-fill"></i><span>文章列表</span></a></li><li><a class="site-page child" href="/categories/"><i class="solitude  st-checkbox-multiple-blank-fill"></i><span>全部分类</span></a></li><li><a class="site-page child" href="/tags/"><i class="solitude  st-price-tag-fill"></i><span>全部标签</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="javascript:void(0);"><span>关于我</span></a><ul class="menus_item_child"><li><a class="site-page child" href="/about/"><i class="solitude  st-contacts-fill"></i><span>自我介绍</span></a></li></ul></div></div></div><div id="nav-left"></div><div id="nav-right"><div class="nav-button" id="nav-totop" onclick="sco.toTop()"><a class="totopbtn"><i class="solitude fas fa-arrow-up"></i><span id="percent">0</span></a></div><div id="toggle-menu"><a class="site-page"><i class="solitude fas fa-bars"></i></a></div></div></div></nav><div class="coverdiv" id="coverdiv"><img class="nolazyload" id="post-cover" src="/2024/06/04/server/image.png" alt="服务器基础配置"></div><div id="post-info"><div id="post-firstinfo"><div class="meta-firstline"><a class="post-meta-original" title="This article is a Original article, pay attention to the copyright.">Original</a><span class="post-meta-categories"><a class="post-meta-categories" href="/categories/server/">server</a></span><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/server/"><span class="tags-name tags-punctuation"><i class="solitude fas fa-hashtag"></i>server</span></a><a class="post-meta__tags" href="/tags/vps/"><span class="tags-name tags-punctuation"><i class="solitude fas fa-hashtag"></i>vps</span></a></div></div></div></div><h1 class="post-title">服务器基础配置</h1><div id="post-meta"><div class="meta-secondline"><span class="post-meta-date" title="Posted on 2024-06-04 11:27:00"><i class="post-meta-icon solitude fas fa-calendar-days"></i><time datetime="2024-06-04T03:27:00.000Z">2024-06-04T03:27:00.000Z</time></span><span class="post-meta-date" title="Last updated on 2024-06-04 16:54:08"><i class="post-meta-icon solitude fas fa-arrows-rotate"></i><time datetime="2024-06-04T08:54:08.000Z">2024-06-04T08:54:08.000Z</time></span></div></div></div><div id="post-info-bottom"></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content article-container"><h2 id="debian-12">debian 12</h2>
+<h3 id="国内源">国内源</h3>
+<p>Debian 的软件源配置文件是 /etc/apt/sources.list。可以先备份配置文件。<br>
+一般情况下，将/etc/apt/sources.list文件中Debian默认的软件仓库地址和安全更新仓库地址修改为国内的镜像地址即可，<br>
+<a target="_blank" rel="noopener" href="http://xn--deb-eo8e44itv6a.debian.xn--orgsecurity-904s.debian.xn--orgmirrors-0x2pt12t.tuna.tsinghua.edu.cn">比如将deb.debian.org和security.debian.org改为mirrors.tuna.tsinghua.edu.cn</a>，并使用https访问，可使用如下命令：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sed -i &quot;s@http://\(deb\|security\).debian.org@https://mirrors.xxx.com@g&quot; /etc/apt/sources.list</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">$ cat /etc/apt/sources.list</span><br><span class="line">deb https://mirrors.tuna.tsinghua.edu.cn/debian/ bullseye main contrib non-free</span><br><span class="line">deb-src https://mirrors.tuna.tsinghua.edu.cn/debian/ bullseye main contrib non-free</span><br><span class="line">deb https://mirrors.tuna.tsinghua.edu.cn/debian/ bullseye-updates main contrib non-free</span><br><span class="line">deb-src https://mirrors.tuna.tsinghua.edu.cn/debian/ bullseye-updates main contrib non-free</span><br><span class="line">deb https://mirrors.tuna.tsinghua.edu.cn/debian/ bullseye-backports main contrib non-free</span><br><span class="line">deb-src https://mirrors.tuna.tsinghua.edu.cn/debian/ bullseye-backports main contrib non-free</span><br><span class="line">deb https://mirrors.tuna.tsinghua.edu.cn/debian-security bullseye-security main contrib non-free</span><br><span class="line">deb-src https://mirrors.tuna.tsinghua.edu.cn/debian-security bullseye-security main contrib non-free</span><br></pre></td></tr></table></figure>
+<p>基础软件</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">apt install git vim</span><br></pre></td></tr></table></figure>
+<h3 id="防火墙">防火墙</h3>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">#</span><span class="language-bash"><span class="comment"># 防火墙设置, Azure 这种防火墙由服务商管理的，不用再配置防火墙。shell</span></span></span><br><span class="line">apt-get update &amp;&amp; apt-get install ufw</span><br><span class="line">ufw enable</span><br><span class="line">ufw status</span><br><span class="line">ufw status verbose</span><br><span class="line"></span><br><span class="line">ufw allow 23/tcp # 23 是你的ssh端口号，ssh是tcp协议</span><br><span class="line">ufw allow ssh # 这是开放预设的 22 端口的</span><br><span class="line"></span><br><span class="line">ufw allow http  #添加80端口</span><br><span class="line"></span><br><span class="line">ufw allow https  #添加443端口</span><br></pre></td></tr></table></figure>
+<h3 id="ssh">ssh</h3>
+<p>ssh 服务器配置： /etc/ssh/sshd_config<br>
+改完后 systemctl restart sshd 重启一下sshd服务</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">PermitRootLogin yes # 允许root登录</span><br><span class="line">PermitRootLogin prohibit-password   # 不允许root密码登录</span><br><span class="line"></span><br><span class="line">PubkeyAuthentication yes    # 允许秘钥登录</span><br><span class="line">PasswordAuthentication no   # 不允许密码登录，如果服务器还有其他用户，可以把其他用户的密码登录也禁用了</span><br></pre></td></tr></table></figure>
+<p>ssh 秘钥配置</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">ssh-keygen -t rsa -b 4096 -C &quot;your_email@example.com&quot; -f ./id_rsa # 生成秘钥</span><br><span class="line">cat id_rsa.pub &gt; ~/.ssh/authorized_keys # 可以使用自己的公钥</span><br><span class="line">chmod 600 ~/.ssh/authorized_keys</span><br></pre></td></tr></table></figure>
+<h3 id="git-基础配置">git 基础配置</h3>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">apt install git</span><br><span class="line">git config --global user.email &quot;example@qq.com&quot;</span><br><span class="line">git config --global user.name &quot;example&quot;</span><br><span class="line">git config --global credential.helper store</span><br></pre></td></tr></table></figure>
+<h3 id="docker">docker</h3>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">先卸载旧版冲突的软件, 如果有，还需要删除 /var/lib/docker</span></span><br><span class="line">for pkg in docker.io docker-doc docker-compose podman-docker containerd runc; do sudo apt-get remove $pkg; done</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">Add Docker<span class="string">&#x27;s official GPG key:</span></span></span><br><span class="line">apt-get update</span><br><span class="line">apt-get install ca-certificates curl</span><br><span class="line">install -m 0755 -d /etc/apt/keyrings</span><br><span class="line">curl -fsSL https://download.docker.com/linux/debian/gpg -o /etc/apt/keyrings/docker.asc</span><br><span class="line">chmod a+r /etc/apt/keyrings/docker.asc</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash"><span class="string">Add the repository to Apt sources:</span></span></span><br><span class="line">echo \</span><br><span class="line">  &quot;deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/debian $(. /etc/os-release &amp;&amp; echo &quot;$VERSION_CODENAME&quot;) stable&quot; | \</span><br><span class="line">  tee /etc/apt/sources.list.d/docker.list &gt; /dev/null</span><br><span class="line"></span><br><span class="line">apt-get update</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash"><span class="string">install docker</span></span></span><br><span class="line">apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin</span><br></pre></td></tr></table></figure>
+<h3 id="podman">podman</h3>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">apt install podman podman-compose</span><br></pre></td></tr></table></figure>
+<h2 id="centos-7">centos 7</h2>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">防火墙设置</span></span><br><span class="line">systemctl status firewalld</span><br><span class="line">firewall-cmd --list-all</span><br><span class="line">firewall-cmd --add-port=80/any --permanent</span><br><span class="line">firewall-cmd --add-port=443/tcp --permanent</span><br><span class="line">firewall-cmd --reload</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">ssh 配置秘钥</span></span><br><span class="line">ssh-keygen -t rsa -b 4096 -C &quot;your_email@example.com&quot; -f ./id_rsa # 生成秘钥</span><br><span class="line">cat id_rsa.pub &gt; ~/.ssh/authorized_keys # 可以使用自己的公钥</span><br><span class="line">chmod 600 ~/.ssh/authorized_keys</span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash"><span class="comment"># 基础软件安装</span></span></span><br><span class="line">yum install -y dnf epel-release &amp;&amp; yum update -y</span><br><span class="line">yum groupinstall -y &quot;Development Tools&quot; </span><br><span class="line">yum install -y  openssh-server vim wget which</span><br><span class="line">yum clean all</span><br><span class="line">curl -sSL https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -o miniconda.sh \</span><br><span class="line">    &amp;&amp; bash miniconda.sh -bfp /usr/local/ \</span><br><span class="line">    &amp;&amp; rm -rf miniconda.sh \</span><br><span class="line">    &amp;&amp; conda config --add channels https://mirrors.bfsu.edu.cn/anaconda/pkgs/free/ \</span><br><span class="line">    &amp;&amp; conda config --add channels https://mirrors.bfsu.edu.cn/anaconda/pkgs/main/ \</span><br><span class="line">    &amp;&amp; conda config --add channels https://mirrors.bfsu.edu.cn/anaconda/pkgs/r/ \</span><br><span class="line">    &amp;&amp; conda config --add channels https://mirrors.bfsu.edu.cn/anaconda/cloud/bioconda/ \</span><br><span class="line">    &amp;&amp; conda config --add channels https://mirrors.bfsu.edu.cn/anaconda/cloud/conda-forge/ \</span><br><span class="line">    &amp;&amp; conda config --set show_channel_urls yes \</span><br><span class="line">    &amp;&amp; conda config --set channel_priority strict \</span><br><span class="line">    &amp;&amp; conda install -y -n base conda-libmamba-solver \</span><br><span class="line">    &amp;&amp; conda config --set solver libmamba \</span><br><span class="line">    &amp;&amp; conda update -y --all \</span><br><span class="line">    &amp;&amp; conda clean --all --yes \</span><br><span class="line">    &amp;&amp; pip config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple</span><br><span class="line">conda install -y git    # centos本身的库里面没有新版git，需要使用conda下载</span><br><span class="line">yum install -y docker docker-compose    # 注意服务不要通过 conda 安装，不然systemctl会无法管理</span><br><span class="line">yum remove -y docker \</span><br><span class="line">    docker-client \</span><br><span class="line">    docker-client-latest \</span><br><span class="line">    docker-common \</span><br><span class="line">    docker-latest \</span><br><span class="line">    docker-latest-logrotate \</span><br><span class="line">    docker-logrotate \</span><br><span class="line">    docker-engine</span><br><span class="line">yum install -y yum-utils</span><br><span class="line">yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo</span><br><span class="line">yum install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin</span><br><span class="line">systemctl enable docker</span><br><span class="line">systemctl start docker</span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash"><span class="comment"># git 基础配置</span></span></span><br><span class="line">git config --global user.email &quot;example@qq.com&quot;</span><br><span class="line">git config --global user.name &quot;example&quot;</span><br><span class="line">git config --global credential.helper store</span><br></pre></td></tr></table></figure>
+<h2 id="armbian">armbian</h2>
+<h3 id="配置网络">配置网络</h3>
+<p>如果你在Armbian中使用Netplan作为网络配置管理工具，那么NetworkManager将会读取和遵循Netplan的配置文件。<br>
+这意味着直接编辑：/etc/NetworkManager/system-connections/&lt;connection_name&gt; 文件可能不会生效，因为NetworkManager将优先考虑Netplan的配置。<br>
+Netplan配置文件：/etc/netplan/01-netcfg.yaml</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">netplan apply   # 使Netplan配置文件生效</span><br><span class="line">ip route    # 查看路由表</span><br><span class="line">ip add  # 查看接口</span><br></pre></td></tr></table></figure></article><div class="post-copyright"><div class="post-copyright__author_group"><div class="post-copyright__author_img"><img class="post-copyright__author_img_front" src= "/img/loading.gif" data-lazy-src="/%5Bobject%20Object%5D"></div><div class="post-copyright__author_name">Shane Hu</div><div class="post-copyright__author_desc">Welcome, friends!</div></div><div class="post-tools" id="post-tools"><div class="post-tools-left"><div id="quit-box" onclick="RemoveRewardMask()"></div></div></div><div class="social-share"><a class="social-share-ico icon-qq" target="_blank" rel="noopener" href="https://connect.qq.com/widget/shareqq/index.html?url=https%3A%2F%2Fhs3434.github.io%2Fhs3434.github.io%2F2024%2F06%2F04%2Fserver%2F&amp;title=%E6%9C%8D%E5%8A%A1%E5%99%A8%E5%9F%BA%E7%A1%80%E9%85%8D%E7%BD%AE&amp;desc=undefined&amp;summary=undefined&amp;site=%E6%9C%8D%E5%8A%A1%E5%99%A8%E5%9F%BA%E7%A1%80%E9%85%8D%E7%BD%AE&amp;pics=2024%2F06%2F04%2Fserver%2Fimage.png" title="Share to QQ"><i class="solitude fab fa-qq"></i></a><a class="social-share-ico icon-weibo" target="_blank" rel="noopener" href="http://service.weibo.com/share/share.php?url=https%3A%2F%2Fhs3434.github.io%2Fhs3434.github.io%2F2024%2F06%2F04%2Fserver%2F&amp;title=%E6%9C%8D%E5%8A%A1%E5%99%A8%E5%9F%BA%E7%A1%80%E9%85%8D%E7%BD%AE&amp;pic=2024%2F06%2F04%2Fserver%2Fimage.png" title="Share to Weibo"><i class="solitude fab fa-weibo"></i></a><a class="social-share-ico icon-twitter" target="_blank" rel="noopener" href="https://twitter.com/intent/tweet?url=https%3A%2F%2Fhs3434.github.io%2Fhs3434.github.io%2F2024%2F06%2F04%2Fserver%2F&amp;text=%E6%9C%8D%E5%8A%A1%E5%99%A8%E5%9F%BA%E7%A1%80%E9%85%8D%E7%BD%AE" title="Share to Twitter"><i class="solitude fab fa-twitter"></i></a><a class="social-share-ico icon-facebook" target="_blank" rel="noopener" href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fhs3434.github.io%2Fhs3434.github.io%2F2024%2F06%2F04%2Fserver%2F" title="Share to Facebook"><i class="solitude fab fa-facebook"></i></a><a class="social-share-ico icon-telegram" target="_blank" rel="noopener" href="https://t.me/share/url?url=https%3A%2F%2Fhs3434.github.io%2Fhs3434.github.io%2F2024%2F06%2F04%2Fserver%2F&amp;text=%E6%9C%8D%E5%8A%A1%E5%99%A8%E5%9F%BA%E7%A1%80%E9%85%8D%E7%BD%AE" title="Share to Telegram"><i class="solitude fab fa-telegram"></i></a><a class="social-share-ico icon-whatsapp" target="_blank" rel="noopener" href="https://api.whatsapp.com/send?text=%E6%9C%8D%E5%8A%A1%E5%99%A8%E5%9F%BA%E7%A1%80%E9%85%8D%E7%BD%AE https%3A%2F%2Fhs3434.github.io%2Fhs3434.github.io%2F2024%2F06%2F04%2Fserver%2F" title="Share to WhatsApp"><i class="solitude fab fa-whatsapp"></i></a><a class="social-share-ico icon-linkedin" target="_blank" rel="noopener" href="https://www.linkedin.com/shareArticle?mini=true&amp;url=https%3A%2F%2Fhs3434.github.io%2Fhs3434.github.io%2F2024%2F06%2F04%2Fserver%2F&amp;title=%E6%9C%8D%E5%8A%A1%E5%99%A8%E5%9F%BA%E7%A1%80%E9%85%8D%E7%BD%AE&amp;summary=undefined&amp;source=%E6%9C%8D%E5%8A%A1%E5%99%A8%E5%9F%BA%E7%A1%80%E9%85%8D%E7%BD%AE" title="Share to LinkedIn"><i class="solitude fab fa-linkedin"></i></a></div><div class="post-copyright__notice"><span class="post-copyright-info">This piece of writing is an original article, utilizing the<a target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh">CC BY-NC-SA 4.0</a>Agreement. For complete reproduction, please acknowledge the source as Courtesy of<a href="/">Blog of Shane Hu</a></span></div></div><div class="post-tools-right"><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/server/"><span class="tags-punctuation"><i class="solitude fas fa-hashtag"></i>server<span class="tagsPageCount">1</span></span></a><a class="post-meta__tags" href="/tags/vps/"><span class="tags-punctuation"><i class="solitude fas fa-hashtag"></i>vps<span class="tagsPageCount">1</span></span></a></div></div></div><nav class="needEndHide pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2024/06/04/Advanced-Algebra/"><div class="pagination-info"><div class="label">Previous</div><div class="prev_info">高等代数（上）丘维声 笔记</div></div></a></div><div class="next-post pull-right"><a href="/2024/06/04/font/"><div class="pagination-info"><div class="label">Next</div><div class="next_info">Fonts 字体安装配置</div></div></a></div></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="card-content"><div class="card-info-avatar is-center"><div class="top-group"><div class="sayhi" id="sayhi" onclick="sco.changeWittyWord()"></div></div></div><div class="avatar"><img alt="Avatar" src= "/img/loading.gif" data-lazy-src="/img/logo.png"></div><div class="description"></div><div class="bottom-group"><span class="left"><div class="name">Shane Hu</div><div class="desc">只有迎风，风筝才能飞得更高。</div></span><div class="social-icons is-center"></div></div></div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="solitude fas fa-bars"></i><span>Table of contents</span></div><div class="toc-content" id="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#debian-12"><span class="toc-text">debian 12</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%9B%BD%E5%86%85%E6%BA%90"><span class="toc-text">国内源</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%98%B2%E7%81%AB%E5%A2%99"><span class="toc-text">防火墙</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#ssh"><span class="toc-text">ssh</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#git-%E5%9F%BA%E7%A1%80%E9%85%8D%E7%BD%AE"><span class="toc-text">git 基础配置</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#docker"><span class="toc-text">docker</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#podman"><span class="toc-text">podman</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#centos-7"><span class="toc-text">centos 7</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#armbian"><span class="toc-text">armbian</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%85%8D%E7%BD%AE%E7%BD%91%E7%BB%9C"><span class="toc-text">配置网络</span></a></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="solitude fas fa-map"></i><span>New posts</span></div><div class="aside-list"><a class="aside-list-item" href="/2025/03/06/250306/" title="vscode 打开powershell出现编码报错问题解决"><div class="thumbnail"><img alt="vscode 打开powershell出现编码报错问题解决" src= "/img/loading.gif" data-lazy-src="/img/default.png"></div><div class="content"><span class="title" href="/2025/03/06/250306/" title="vscode 打开powershell出现编码报错问题解决">vscode 打开powershell出现编码报错问题解决</span><span class="categories" href="/2025/03/06/250306/">vscode</span></div></a><a class="aside-list-item" href="/2025/03/03/transformer1/" title="tansformer 从入门到上手只需要看这一篇"><div class="thumbnail"><img alt="tansformer 从入门到上手只需要看这一篇" src= "/img/loading.gif" data-lazy-src="/img/default.png"></div><div class="content"><span class="title" href="/2025/03/03/transformer1/" title="tansformer 从入门到上手只需要看这一篇">tansformer 从入门到上手只需要看这一篇</span><span class="categories" href="/2025/03/03/transformer1/">AI</span></div></a><a class="aside-list-item" href="/2024/06/20/2406202/" title="使用 dnscrypt-proxy 解决 dns 被劫持污染问题"><div class="thumbnail"><img alt="使用 dnscrypt-proxy 解决 dns 被劫持污染问题" src= "/img/loading.gif" data-lazy-src="/img/default.png"></div><div class="content"><span class="title" href="/2024/06/20/2406202/" title="使用 dnscrypt-proxy 解决 dns 被劫持污染问题">使用 dnscrypt-proxy 解决 dns 被劫持污染问题</span><span class="categories" href="/2024/06/20/2406202/">jottings</span></div></a><a class="aside-list-item" href="/2024/06/20/240620/" title="debian 使用 dnscrypt-proxy 后 53 端口被  1/init systemd 占用问题"><div class="thumbnail"><img alt="debian 使用 dnscrypt-proxy 后 53 端口被  1/init systemd 占用问题" src= "/img/loading.gif" data-lazy-src="/img/default.png"></div><div class="content"><span class="title" href="/2024/06/20/240620/" title="debian 使用 dnscrypt-proxy 后 53 端口被  1/init systemd 占用问题">debian 使用 dnscrypt-proxy 后 53 端口被  1/init systemd 占用问题</span><span class="categories" href="/2024/06/20/240620/">jottings</span></div></a><a class="aside-list-item" href="/2024/06/19/240619/" title="HTTP Status 307缓存的处理"><div class="thumbnail"><img alt="HTTP Status 307缓存的处理" src= "/img/loading.gif" data-lazy-src="/img/default.png"></div><div class="content"><span class="title" href="/2024/06/19/240619/" title="HTTP Status 307缓存的处理">HTTP Status 307缓存的处理</span><span class="categories" href="/2024/06/19/240619/">jottings</span></div></a></div></div></div></div></main><footer id="footer"><div id="st-footer-bar"><div class="footer-logo"><span>主页</span></div><div class="footer-bar-description">来自 Shane Hu 的文章</div><a class="footer-bar-link" href="/about/">了解更多</a></div><div id="footer-bar"><div class="footer-bar-links"><div class="footer-bar-left"><div class="copyright">© 2024 - 2025 By&nbsp;<a class="footer-bar-link" href="/"><img class="author-avatar" src= "/img/loading.gif" data-lazy-src="/img/pwa/favicon.ico">Shane Hu</a></div><div class="beian-group"><a class="footer-bar-link" target="_blank" rel="noopener" href="https://hexo.io/">Framework: Hexo</a><a class="footer-bar-link" target="_blank" rel="noopener" href="https://github.com/everfu/hexo-theme-solitude">Theme: Solitude</a></div></div><div class="footer-bar-right"><a class="footer-bar-link" target="_blank" rel="noopener" href="https://github.com/valor-x/hexo-theme-solitude" alt="主题">主题</a></div></div></div></footer></div><!-- right_menu--><!-- inject body--><div><script src="/js/utils.js?v=3.0.14"></script><script src="/js/main.js?v=3.0.14"></script><script src="/js/third_party/waterfall.min.js?v=3.0.14"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/pjax/0.2.8/pjax.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/11.4.1/mermaid.min.js"></script><script src="/js/third_party/universe.min.js?v=3.0.14"></script><script>dark()
+</script><script src="/js/tw_cn.js?v=3.0.14"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-lazyload/19.1.3/lazyload.iife.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/node-snackbar/0.1.16/snackbar.min.js"></script><script>window.paceOptions = {
+  restartOnPushState: false
+}
+
+utils.addGlobalFn('pjaxSend', () => {
+  Pace.restart()
+}, 'pace_restart')
+</script><script src="https://cdnjs.cloudflare.com/ajax/libs/pace/1.2.4/pace.min.js"></script><div class="js-pjax"><script>mermaid.run();
+</script></div></div><!-- pjax--><script>const pjax = new Pjax({
+    elements: 'a:not([target="_blank"])',
+    selectors: ["title","#body-wrap","#site-config","meta[name=\"description\"]",".js-pjax","meta[property^=\"og:\"]","#config-diff",".rs_show",".rs_hide"],
+    cacheBust: false,
+    analytics: false,
+    scrollRestoration: false
+})
+
+document.querySelectorAll('script[data-pjax]').forEach(item => {
+    const newScript = document.createElement('script')
+    const content = item.text || item.textContent || item.innerHTML || ""
+    Array.from(item.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value))
+    newScript.appendChild(document.createTextNode(content))
+    item.parentNode.replaceChild(newScript, item)
+})
+
+document.addEventListener('pjax:complete', () => {
+    window.refreshFn()
+
+    document.querySelectorAll('script[data-pjax]').forEach(item => {
+        const newScript = document.createElement('script')
+        const content = item.text || item.textContent || item.innerHTML || ""
+        Array.from(item.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value))
+        newScript.appendChild(document.createTextNode(content))
+        item.parentNode.replaceChild(newScript, item)
+    })
+
+    GLOBAL_CONFIG.islazyload && window.lazyLoadInstance.update()
+
+})
+
+document.addEventListener('pjax:error', (e) => {
+    if (e.request.status === 404) {
+        pjax.loadUrl('/404.html')
+    }
+})</script><!-- google adsense--><!-- search--><!-- music--></body></html>
+        <script>
+            const posts = ["2025/03/06/250306/","2025/03/03/transformer1/","2024/06/20/2406202/","2024/06/20/240620/","2024/06/19/240619/","2024/06/06/Dante/","2024/06/06/solitude/","2024/06/05/udesk2/","2024/06/05/udesk1/","2024/06/04/Advanced-Algebra/","2024/06/04/server/","2024/06/04/font/","2024/06/04/ydns/","2024/06/04/conda/","2024/06/04/bind9/","2024/06/04/openwrt/","2024/06/04/ssl/","2024/06/03/hexo/"];
+            function toRandomPost() {
+                const randomPost = posts[Math.floor(Math.random() * posts.length)];
+                pjax.loadUrl(GLOBAL_CONFIG.root + randomPost);
+            }
+        </script>
