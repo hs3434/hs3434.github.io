@@ -1679,8 +1679,6 @@ body {
   line-height: 2;
   -webkit-tap-highlight-color: transparent;
   margin: 0;
-  user-select: none;
-  -webkit-user-select: none;
 }
 * {
   box-sizing: border-box;
