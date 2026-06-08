@@ -1,0 +1,275 @@
+<!DOCTYPE html><html lang="en" data-theme="light"><head><meta charset="utf-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1"><title>不满 Snakemake 的静态 rule？我用 Python 对象动态构建了一条 RNA-seq 流水线 | Shane Hu</title><noscript>Please enable JavaScript to view the site</noscript><link rel="icon" href="/img/pwa/favicon.png"><!-- index.css--><link rel="stylesheet" href="/css/index.css?v=3.0.14"><!-- inject head--><link rel="canonical" href="https://hs3434.github.io/hs3434.github.io/2025/06/08/rnaseq-pipeline-engineering/index.html"><link rel="stylesheet" href="https://fastly.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.7.2/css/all.min.css"><!-- aplayer--><!-- swiper--><!-- fancybox ui--><!-- katex--><link rel="stylesheet" href="https://fastly.jsdelivr.net/npm/katex@0.16.21/dist/katex.min.css"><!-- Open Graph--><meta name="description" content="背景 RNA-seq 差异表达分析是一条长链路：从原始数据下载 → 差异分析 → 机器学习特征筛选 → 验证 → 富集分析 → 免疫浸润 → 调控网络 → 预后建模 → 自动生成报告，涉及 30+ 分析步骤、70+ 脚本。 主流方案是用 Snakemake 写 rule 来编排。但 Snakemak"><!-- pwa--><meta name="apple-mobile-web-app-capable" content="Shane Hu"><meta name="theme-color" content="var(--efu-main)"><meta name="apple-mobile-web-app-status-bar-style" content="var(--efu-main)"><link rel="bookmark" href="/img/pwa/favicon.png"><link rel="apple-touch-icon" href="/img/pwa/favicon.png" sizes="180x180"><script>console.log(' %c Solitude %c ' + '3.0.14' + ' %c https://github.com/everfu/hexo-theme-solitude',
+    'background:#35495e ; padding: 1px; border-radius: 3px 0 0 3px;  color: #fff',
+    'background:#ff9a9a ; padding: 1px; border-radius: 0 3px 3px 0;  color: #fff',
+    'background:unset ; padding: 1px; border-radius: 0 3px 3px 0;  color: #fff')
+</script><script>let mdate = "7-7,9-18,12-13";
+mdate = (mdate.split(","));
+let ndate = new Date();
+for (let i of mdate) {
+    if (i === (ndate.getMonth()+1) + "-" + (ndate.getDate())) {
+        document.documentElement.classList.add('memorial');
+    }
+}
+</script><script>(()=>{
+        const saveToLocal = {
+            set: function setWithExpiry(key, value, ttl) {
+                if (ttl === 0)
+                    return
+                const now = new Date()
+                const expiryDay = ttl * 86400000
+                const item = {
+                    value: value,
+                    expiry: now.getTime() + expiryDay
+                }
+                localStorage.setItem(key, JSON.stringify(item))
+            },
+            get: function getWithExpiry(key) {
+                const itemStr = localStorage.getItem(key)
+
+                if (!itemStr) {
+                    return undefined
+                }
+                const item = JSON.parse(itemStr)
+                const now = new Date()
+
+                if (now.getTime() > item.expiry) {
+                    localStorage.removeItem(key)
+                    return undefined
+                }
+                return item.value
+            }
+        };
+        window.utils = {
+            saveToLocal: saveToLocal,
+            getCSS: (url, id = false) => new Promise((resolve, reject) => {
+              const link = document.createElement('link')
+              link.rel = 'stylesheet'
+              link.href = url
+              if (id) link.id = id
+              link.onerror = reject
+              link.onload = link.onreadystatechange = function() {
+                const loadState = this.readyState
+                if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+                link.onload = link.onreadystatechange = null
+                resolve()
+              }
+              document.head.appendChild(link)
+            }),
+            getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+              const script = document.createElement('script')
+              script.src = url
+              script.async = true
+              script.onerror = reject
+              script.onload = script.onreadystatechange = function() {
+                const loadState = this.readyState
+                if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+                script.onload = script.onreadystatechange = null
+                resolve()
+              }
+
+              Object.keys(attr).forEach(key => {
+                script.setAttribute(key, attr[key])
+              })
+
+              document.head.appendChild(script)
+            }),
+            addGlobalFn: (key, fn, name = false, parent = window) => {
+                const globalFn = parent.globalFn || {}
+                const keyObj = globalFn[key] || {}
+
+                if (name && keyObj[name]) return
+
+                name = name || Object.keys(keyObj).length
+                keyObj[name] = fn
+                globalFn[key] = keyObj
+                parent.globalFn = globalFn
+            },
+            addEventListenerPjax: (ele, event, fn, option = false) => {
+              ele.addEventListener(event, fn, option)
+              utils.addGlobalFn('pjax', () => {
+                  ele.removeEventListener(event, fn, option)
+              })
+          },
+        }
+    })()</script><!-- theme--><script>initTheme = () => {
+    let isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches
+    const cachedMode = utils.saveToLocal.get('theme');
+    if (cachedMode === undefined) {
+        const nowMode =
+            isDarkMode ? 'dark' : 'light'
+        document.documentElement.setAttribute('data-theme', nowMode);
+    } else {
+        document.documentElement.setAttribute('data-theme', cachedMode);
+    }
+    typeof rm === 'object' && rm.mode(cachedMode === 'dark' && isDarkMode)
+}
+initTheme()</script><!-- global head--><script>const GLOBAL_CONFIG = {
+    root: '/',
+    algolia: undefined,
+    localsearch: undefined,
+    runtime: '2024-06-03 00:00:00',
+    lazyload: {
+        enable: true,
+        error: '/img/error_load.avif'
+    },
+    copyright: {"limit":50,"author":"Author: Shane Hu","link":"Link: ","source":"Source: Shane Hu","info":"Copyright is owned by the author. For commercial reprints, please contact the author for authorization. For non-commercial reprints, please indicate the source."},
+    highlight: {"limit":200,"expand":true,"copy":true,"syntax":"highlight.js"},
+    randomlink: false,
+    lang: {"theme":{"dark":"Dark","light":"Light"},"copy":{"success":"Copied","error":"Copy failed"},"backtop":"Back to top","time":{"day":" days ago","hour":" hours ago","just":"just","min":" minutes ago","month":" months ago"},"day":" days","f12":"Developer mode is turned on, please follow the GPL.","totalk":"You don't need to delete blank lines, just type in your comments."},
+    aside: {
+        state: {
+            morning: "✨ 早上好，新的一天开始了",
+            noon: "🍲 午餐时间",
+            afternoon: "🌞 下午好",
+            night: "早点休息",
+            goodnight: "晚安 😴",
+        },
+        witty_words: [],
+        witty_comment: {
+            prefix: 'Long time no see, ',
+            back: 'Welcome back again,',
+        },
+    },
+    covercolor: {
+        enable: false
+    },
+    comment: false,
+    lightbox: 'null',
+    right_menu: false,
+    translate: {"translateDelay":0,"defaultEncoding":2},
+    lure: false,
+    expire: false,
+};</script><!-- page-config head--><script id="config-diff">var PAGE_CONFIG = {
+    is_post: true,
+    is_page: false,
+    is_home: false,
+    page: '',
+    toc: true,
+    comment: false,
+    ai_text: false,
+    color: false,
+}</script><meta name="generator" content="Hexo 7.3.0"></head><body id="body"><!-- universe--><canvas id="universe"></canvas><!-- background img--><!-- loading--><!-- console--><!-- sidebar--><div id="sidebar" style="zoom: 1;"><div id="menu-mask" style="display: none;"></div><div id="sidebar-menus"><div class="site-data"><div class="data-item is-center"><div class="data-item-link"><a href="/archives/"><div class="headline">Archives</div><div class="length-num">24</div></a></div></div><div class="data-item is-center"><div class="data-item-link"><a href="/categories/"><div class="headline">Categories</div><div class="length-num">9</div></a></div></div><div class="data-item is-center"><div class="data-item-link"><a href="/tags/"><div class="headline">Tags</div><div class="length-num">43</div></a></div></div></div><span class="sidebar-menu-item-title">Function</span><div class="sidebar-menu-item"><span class="darkmode_switchbutton menu-child" onclick="sco.switchDarkMode()"><i class="solitude fas fa-circle-half-stroke"></i><span>Display mode</span></span></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="javascript:void(0);"><span>文库</span></a><ul class="menus_item_child"><li><a class="site-page child" href="/archives/"><i class="solitude  fas fa-folder-closed"></i><span>全部文章</span></a></li><li><a class="site-page child" href="/categories/"><i class="solitude  fas fa-clone"></i><span>全部分类</span></a></li><li><a class="site-page child" href="/tags/"><i class="solitude  fas fa-tags"></i><span>全部标签</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="javascript:void(0);"><span>关于</span></a><ul class="menus_item_child"><li><a class="site-page child" href="/about/"><i class="solitude  st-contacts-fill"></i><span>自我介绍</span></a></li><li><a class="site-page child" href="/projects/"><i class="solitude  fas fa-code"></i><span>项目作品</span></a></li></ul></div></div><span class="sidebar-menu-item-title">Tags</span><div class="card-tags"><div class="card-tag-cloud"><a href="/tags/web/">web<sup>1</sup></a><a href="/tags/http/">http<sup>1</sup></a><a href="/tags/debian/">debian<sup>1</sup></a><a href="/tags/dns/">dns<sup>2</sup></a><a href="/tags/53port/">53port<sup>1</sup></a><a href="/tags/socks5/">socks5<sup>1</sup></a><a href="/tags/Dante/">Dante<sup>1</sup></a><a href="/tags/algebra/">algebra<sup>1</sup></a><a href="/tags/mathematics/">mathematics<sup>2</sup></a><a href="/tags/bind9/">bind9<sup>1</sup></a><a href="/tags/conda/">conda<sup>2</sup></a><a href="/tags/Fonts/">Fonts<sup>1</sup></a><a href="/tags/OpenWRT/">OpenWRT<sup>1</sup></a><a href="/tags/hexo/">hexo<sup>2</sup></a><a href="/tags/server/">server<sup>1</sup></a><a href="/tags/vps/">vps<sup>2</sup></a><a href="/tags/theme/">theme<sup>1</sup></a><a href="/tags/ssl/">ssl<sup>1</sup></a><a href="/tags/AI-pytorch/">AI pytorch<sup>1</sup></a><a href="/tags/jottings/">jottings<sup>2</sup></a><a href="/tags/python/">python<sup>6</sup></a><a href="/tags/mysql/">mysql<sup>2</sup></a><a href="/tags/api/">api<sup>2</sup></a><a href="/tags/udesk/">udesk<sup>2</sup></a><a href="/tags/ydns/">ydns<sup>1</sup></a><a href="/tags/ddns/">ddns<sup>1</sup></a><a href="/tags/vscode/">vscode<sup>1</sup></a><a href="/tags/R/">R<sup>2</sup></a><a href="/tags/xray/">xray<sup>1</sup></a><a href="/tags/snakemake/">snakemake<sup>2</sup></a><a href="/tags/pipeline/">pipeline<sup>2</sup></a><a href="/tags/bioinformatics/">bioinformatics<sup>1</sup></a><a href="/tags/calculus/">calculus<sup>1</sup></a><a href="/tags/dev/">dev<sup>1</sup></a><a href="/tags/slurm/">slurm<sup>1</sup></a><a href="/tags/hpc/">hpc<sup>1</sup></a><a href="/tags/cluster/">cluster<sup>1</sup></a><a href="/tags/eeg/">eeg<sup>2</sup></a><a href="/tags/qt/">qt<sup>1</sup></a><a href="/tags/mne/">mne<sup>1</sup></a><a href="/tags/pytorch/">pytorch<sup>1</sup></a><a href="/tags/transformer/">transformer<sup>1</sup></a><a href="/tags/deep-learning/">deep-learning<sup>1</sup></a></div></div></div></div><!-- keyboard--><!-- righhtside--><div class="post" id="body-wrap"><header class="not-top-img" id="page-header"><nav class="show" id="nav"><div id="nav-group"><div id="blog_name"><a id="site-name" href="/" title="Back to home"><span class="title">主页</span><i class="solitude fas fa-home"></i></a></div><div id="page-name-mask"><div id="page-name"><a id="page-name-text" onclick="sco.toTop()">不满 Snakemake 的静态 rule？我用 Python 对象动态构建了一条 RNA-seq 流水线</a></div></div><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="javascript:void(0);"><span>文库</span></a><ul class="menus_item_child"><li><a class="site-page child" href="/archives/"><i class="solitude  fas fa-folder-closed"></i><span>全部文章</span></a></li><li><a class="site-page child" href="/categories/"><i class="solitude  fas fa-clone"></i><span>全部分类</span></a></li><li><a class="site-page child" href="/tags/"><i class="solitude  fas fa-tags"></i><span>全部标签</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="javascript:void(0);"><span>关于</span></a><ul class="menus_item_child"><li><a class="site-page child" href="/about/"><i class="solitude  st-contacts-fill"></i><span>自我介绍</span></a></li><li><a class="site-page child" href="/projects/"><i class="solitude  fas fa-code"></i><span>项目作品</span></a></li></ul></div></div></div><div id="nav-left"></div><div id="nav-right"><div class="nav-button" id="nav-totop" onclick="sco.toTop()"><a class="totopbtn"><i class="solitude fas fa-arrow-up"></i><span id="percent">0</span></a></div><div id="toggle-menu"><a class="site-page"><i class="solitude fas fa-bars"></i></a></div></div></div></nav></header><main class="layout" id="content-inner"><div id="post"><div id="post-info"><div id="post-firstinfo"><div class="meta-firstline"><a class="post-meta-original" title="This article is a Original article, pay attention to the copyright.">Original</a><span class="post-meta-categories"><a class="post-meta-categories" href="/categories/engineering/">engineering</a></span><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/python/"><span class="tags-name tags-punctuation"><i class="solitude fas fa-hashtag"></i>python</span></a><a class="post-meta__tags" href="/tags/snakemake/"><span class="tags-name tags-punctuation"><i class="solitude fas fa-hashtag"></i>snakemake</span></a><a class="post-meta__tags" href="/tags/pipeline/"><span class="tags-name tags-punctuation"><i class="solitude fas fa-hashtag"></i>pipeline</span></a><a class="post-meta__tags" href="/tags/bioinformatics/"><span class="tags-name tags-punctuation"><i class="solitude fas fa-hashtag"></i>bioinformatics</span></a></div></div></div></div><h1 class="post-title">不满 Snakemake 的静态 rule？我用 Python 对象动态构建了一条 RNA-seq 流水线</h1><div id="post-meta"><div class="meta-secondline"><span class="post-meta-date" title="Posted on 2025-06-08 00:00:00"><i class="post-meta-icon solitude fas fa-calendar-days"></i><time datetime="2025-06-07T16:00:00.000Z">2025-06-07T16:00:00.000Z</time></span><span class="post-meta-date" title="Last updated on 2026-06-08 16:10:13"><i class="post-meta-icon solitude fas fa-arrows-rotate"></i><time datetime="2026-06-08T08:10:13.865Z">2026-06-08T08:10:13.865Z</time></span><span class="post-meta-position" title="The author's IP belongs toChina"><i class="post-meta-icon solitude fas fa-location-dot"></i><span>China</span></span></div></div></div><div id="post-info-bottom"></div><article class="post-content article-container"><h2 id="背景">背景</h2>
+<p>RNA-seq 差异表达分析是一条长链路：从原始数据下载 → 差异分析 → 机器学习特征筛选 → 验证 → 富集分析 → 免疫浸润 → 调控网络 → 预后建模 → 自动生成报告，涉及 30+ 分析步骤、70+ 脚本。</p>
+<p>主流方案是用 Snakemake 写 rule 来编排。但 Snakemake 的 rule 语法是静态的——rule 之间的依赖关系在 Snakefile 里写死，模块无法随意组合。分析需求千变万化：有人只做差异+富集，有人要做 WGCNA+ML+验证，有人要加单细胞。每次改流程都得手动调 rule，维护成本很高。</p>
+<p>我的思路：<strong>不写 rule，用 Python 对象动态生成 rule</strong>。</p>
+<h2 id="架构总览">架构总览</h2>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">YAML 配置 (DAG)</span><br><span class="line">      │</span><br><span class="line">      ▼</span><br><span class="line">  parse_node() ──→ networkx.DiGraph (拓扑排序)</span><br><span class="line">      │</span><br><span class="line">      ▼</span><br><span class="line">  RnaSeq(RuleSet) ──→ 按 topo order 实例化 30+ RuleSet</span><br><span class="line">      │</span><br><span class="line">      ▼</span><br><span class="line">  bound_workflow() ──→ 把 MyRule 树动态注册到 Snakemake Workflow</span><br><span class="line">      │</span><br><span class="line">      ▼</span><br><span class="line">  Snakemake 执行</span><br></pre></td></tr></table></figure>
+<p>核心设计三个层次：</p>
+<ul>
+<li><strong>MyRule</strong>：单条 rule 的抽象，声明脚本、参数占位符、输入输出</li>
+<li><strong>RuleSet</strong>：rule 的容器，多个 MyRule 组合为一个分析模块，模块间通过 <code>_export</code> 暴露数据接口</li>
+<li><strong>RnaSeq</strong>：顶层编排器，读 YAML 配置构建 DAG，按拓扑序实例化 RuleSet，最终绑定到 Snakemake</li>
+</ul>
+<h2 id="核心设计">核心设计</h2>
+<h3 id="1-MyRule：从-Python-对象到-Snakemake-rule">1. MyRule：从 Python 对象到 Snakemake rule</h3>
+<p>传统写法：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">rule diff:</span><br><span class="line">    <span class="built_in">input</span>:</span><br><span class="line">        mat=<span class="string">&quot;result/input/mat.csv&quot;</span>,</span><br><span class="line">        <span class="built_in">map</span>=<span class="string">&quot;result/input/map.csv&quot;</span></span><br><span class="line">    output:</span><br><span class="line">        gene=<span class="string">&quot;result/diff/gene.csv&quot;</span>,</span><br><span class="line">        mat=<span class="string">&quot;result/diff/mat.csv&quot;</span></span><br><span class="line">    params:</span><br><span class="line">        pval=<span class="number">0.05</span>, method=<span class="string">&quot;limma&quot;</span></span><br><span class="line">    script:</span><br><span class="line">        <span class="string">&quot;scripts/diff.R&quot;</span></span><br></pre></td></tr></table></figure>
+<p>我的写法：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">DiffRule</span>(<span class="title class_ inherited__">MyRule</span>):</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params">self</span>):</span><br><span class="line">        <span class="built_in">super</span>().__init__()</span><br><span class="line">        <span class="variable language_">self</span>.script = <span class="string">&quot;diff.R&quot;</span></span><br><span class="line">        <span class="variable language_">self</span>.args = [<span class="string">&quot;&#123;input.mat&#125;&quot;</span>, <span class="string">&quot;&#123;input.map&#125;&quot;</span>, <span class="string">&quot;&#123;output.gene&#125;&quot;</span>, <span class="string">&quot;&#123;output.mat&#125;&quot;</span>,</span><br><span class="line">                     <span class="string">&quot;&#123;params.pval&#125;&quot;</span>, <span class="string">&quot;&#123;params.method&#125;&quot;</span>]</span><br><span class="line">        <span class="variable language_">self</span>._<span class="built_in">input</span> = &#123;<span class="string">&quot;mat&quot;</span>: ..., <span class="string">&quot;map&quot;</span>: ...&#125;</span><br><span class="line">        <span class="variable language_">self</span>._output = &#123;<span class="string">&quot;gene&quot;</span>: <span class="string">&quot;gene.csv&quot;</span>, <span class="string">&quot;mat&quot;</span>: <span class="string">&quot;mat.csv&quot;</span>&#125;</span><br><span class="line">        <span class="variable language_">self</span>._params = &#123;<span class="string">&quot;pval&quot;</span>: <span class="number">0.05</span>, <span class="string">&quot;method&quot;</span>: <span class="string">&quot;limma&quot;</span>&#125;</span><br></pre></td></tr></table></figure>
+<p>看起来只是把声明式换成了对象式，但关键区别在于：<strong>args 里的 <code>&#123;input.mat&#125;</code> 不是字符串模板，而是声明式标记</strong>。</p>
+<p><code>add_args()</code> 在 <code>__init_subclass__</code> 阶段自动解析 args，把 <code>&#123;input.mat&#125;</code> 注册到 <code>_input_key</code>，把 <code>&#123;output.gene&#125;</code> 注册到 <code>_output_key</code>。这样 RuleSet 的构造函数传入什么值，对应的 input/output 就是什么——<strong>参数来源由运行时决定，而不是写死</strong>。</p>
+<p>当 <code>bound_workflow()</code> 被调用时，每个 MyRule 被翻译成 Snakemake 的 <code>RuleInfo</code> 对象，注册到 <code>Workflow</code> 中：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">bound_workflow</span>(<span class="params">self, workflow: Workflow</span>):</span><br><span class="line">    <span class="keyword">for</span> r <span class="keyword">in</span> <span class="variable language_">self</span>.all_rules():</span><br><span class="line">        ruleinfo = RuleInfo(r.func())</span><br><span class="line">        ruleinfo.<span class="built_in">input</span> = InOutput([], r.<span class="built_in">input</span>(), ...)</span><br><span class="line">        ruleinfo.output = InOutput([], r.output(), ...)</span><br><span class="line">        ruleinfo.params = ([], r.kwparams())</span><br><span class="line">        workflow.rule(name=r.name)(ruleinfo)</span><br></pre></td></tr></table></figure>
+<p>到这里，Snakemake 看到的就是普通的 rule——但它是由 Python 代码动态生成的。</p>
+<h3 id="2-RuleSet-Parameter：模块间数据流解耦">2. RuleSet + Parameter：模块间数据流解耦</h3>
+<p>一个分析模块（比如差异分析 DiffSets）包含多条 rule：差异分析、火山图、热图、染色体定位……它们组成一个 RuleSet。</p>
+<p>模块间的数据传递通过 <code>_export</code> 和 <code>Parameter</code> 实现：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">DiffSets</span>(<span class="title class_ inherited__">RuleSet</span>):</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params">self, config, name, in_mat, in_map, in_gene, locate</span>):</span><br><span class="line">        <span class="built_in">super</span>().__init__(config, name)</span><br><span class="line">        <span class="comment"># in_mat 是上游 Check 模块的 out_mat Parameter</span></span><br><span class="line">        <span class="comment"># 直接传入，不需要知道上游的文件路径</span></span><br><span class="line">        diff = DiffRule(in_mat=in_mat, in_map=in_map, ...)</span><br><span class="line">        <span class="variable language_">self</span>.append(diff)</span><br><span class="line">        <span class="comment"># 通过 _export 暴露接口给下游</span></span><br><span class="line">        <span class="comment"># 下游模块通过 get_pre_file(config[name][&quot;pre&quot;][&quot;gene&quot;], &quot;out_gene&quot;) 获取</span></span><br></pre></td></tr></table></figure>
+<p><code>Parameter</code> 是带类型的值包装器，支持三种值类型：</p>
+<ul>
+<li><code>value</code>：普通值（数字、字符串）</li>
+<li><code>path</code>：文件路径（在脚本实例化时自动计算相对路径）</li>
+<li><code>json</code>：复杂结构（序列化为 JSON 传给 R 脚本）</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Parameter</span>:</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params">self, value, value_type=<span class="string">&quot;value&quot;</span>, param_type=<span class="string">&quot;param&quot;</span>, name=<span class="literal">None</span></span>):</span><br><span class="line">        <span class="comment"># 如果传入的是已有 Parameter，继承其属性</span></span><br><span class="line">        <span class="keyword">if</span> <span class="built_in">isinstance</span>(value, Parameter):</span><br><span class="line">            <span class="variable language_">self</span>.value = value.value</span><br><span class="line">            <span class="variable language_">self</span>.value_type = value_type <span class="keyword">or</span> value.value_type</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            <span class="variable language_">self</span>.value = value</span><br><span class="line">            <span class="variable language_">self</span>.value_type = value_type</span><br></pre></td></tr></table></figure>
+<p>这意味着上游模块只需 <code>_export</code> 一个 Parameter，下游模块直接引用——<strong>模块间只通过接口耦合，不通过路径字符串耦合</strong>。</p>
+<h3 id="3-YAML-配置驱动-DAG">3. YAML 配置驱动 DAG</h3>
+<p>这是整个框架的灵魂。用户通过一个 YAML 文件定义分析流程：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">step:</span> <span class="string">ALL</span></span><br><span class="line"></span><br><span class="line"><span class="attr">GSE12345:</span></span><br><span class="line">  <span class="attr">analysis:</span> <span class="string">input</span></span><br><span class="line">  <span class="attr">gse:</span> <span class="string">GSE12345</span></span><br><span class="line">  <span class="attr">platform:</span> <span class="string">GPL570</span></span><br><span class="line"></span><br><span class="line"><span class="attr">Diff:</span></span><br><span class="line">  <span class="attr">analysis:</span> <span class="string">Diffanalysis</span></span><br><span class="line">  <span class="attr">pre:</span></span><br><span class="line">    <span class="attr">input:</span> <span class="string">GSE12345</span></span><br><span class="line">    <span class="attr">gene:</span> <span class="literal">null</span></span><br><span class="line">  <span class="attr">locate:</span> <span class="number">1</span></span><br><span class="line">  <span class="attr">pval:</span> <span class="number">0.05</span></span><br><span class="line"></span><br><span class="line"><span class="attr">GO:</span></span><br><span class="line">  <span class="attr">analysis:</span> <span class="string">GOKEGG</span></span><br><span class="line">  <span class="attr">pre:</span></span><br><span class="line">    <span class="attr">gene:</span> <span class="string">Diff</span></span><br><span class="line"></span><br><span class="line"><span class="attr">IMMUNE:</span></span><br><span class="line">  <span class="attr">analysis:</span> <span class="string">IMMUNE</span></span><br><span class="line">  <span class="attr">pre:</span></span><br><span class="line">    <span class="attr">mat:</span> <span class="string">Diff</span></span><br><span class="line">    <span class="attr">map:</span> <span class="string">Diff</span></span><br><span class="line">    <span class="attr">gene:</span> <span class="string">Diff</span></span><br><span class="line">  <span class="attr">immune:</span> <span class="string">cibersort</span></span><br></pre></td></tr></table></figure>
+<p><code>parse_node()</code> 把这个 YAML 解析成 <code>networkx.DiGraph</code>，自动拓扑排序：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">parse_node</span>(<span class="params">config: <span class="built_in">dict</span></span>) -&gt; nx.DiGraph:</span><br><span class="line">    dag = nx.DiGraph()</span><br><span class="line">    <span class="keyword">for</span> key, value <span class="keyword">in</span> config.items():</span><br><span class="line">        <span class="keyword">if</span> key == <span class="string">&quot;step&quot;</span> <span class="keyword">or</span> key == <span class="string">&quot;global&quot;</span>: <span class="keyword">continue</span></span><br><span class="line">        dag.add_node(key, **value)</span><br><span class="line">        pre = value.get(<span class="string">&quot;pre&quot;</span>)</span><br><span class="line">        <span class="keyword">if</span> pre:</span><br><span class="line">            <span class="comment"># 根据 pre 字段建边</span></span><br><span class="line">            ...</span><br><span class="line">    <span class="keyword">if</span> <span class="keyword">not</span> nx.is_directed_acyclic_graph(dag):</span><br><span class="line">        <span class="keyword">raise</span> ValueError(<span class="string">f&quot;流程中存在环依赖，无法拓扑排序&quot;</span>)</span><br><span class="line">    <span class="keyword">for</span> v, name <span class="keyword">in</span> <span class="built_in">enumerate</span>(nx.topological_sort(dag)):</span><br><span class="line">        dag.nodes[name][<span class="string">&quot;index&quot;</span>] = v + <span class="number">1</span>  <span class="comment"># 作为输出目录前缀</span></span><br><span class="line">    <span class="keyword">return</span> dag</span><br></pre></td></tr></table></figure>
+<p>拓扑序决定了模块实例化顺序和输出目录编号（<code>1-GSE12345/</code>、<code>3-Diff/</code>、<code>4-GO/</code>）。</p>
+<p><strong>想改流程？改一行 YAML 就行。</strong> 要加 WGCNA，加个节点指个 pre；要去掉免疫分析，删掉那个节点。不需要动任何 Python 代码。</p>
+<h3 id="4-脚本实例化：自文档化的输出">4. 脚本实例化：自文档化的输出</h3>
+<p>每个 rule 执行前，<code>write_src()</code> 会把 R 脚本复制到输出目录，并把所有 <code>&#123;input.xxx&#125;</code> / <code>&#123;output.xxx&#125;</code> / <code>&#123;params.xxx&#125;</code> 替换为实际解析后的路径和值：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">write_src</span>(<span class="params">self</span>):</span><br><span class="line">    cmd = <span class="variable language_">self</span>.shellcmd()</span><br><span class="line">    parts = shlex.split(cmd)</span><br><span class="line">    filename = os.path.basename(parts[<span class="number">0</span>])</span><br><span class="line">    out = Path(<span class="variable language_">self</span>.out_prefix, <span class="string">f&quot;<span class="subst">&#123;self.index&#125;</span>-<span class="subst">&#123;filename&#125;</span>&quot;</span>)</span><br><span class="line">    <span class="keyword">with</span> <span class="built_in">open</span>(parts[<span class="number">0</span>], <span class="string">&quot;r&quot;</span>) <span class="keyword">as</span> f:</span><br><span class="line">        src = f.read()</span><br><span class="line">        <span class="keyword">for</span> i, arg <span class="keyword">in</span> <span class="built_in">enumerate</span>(resolved_args):</span><br><span class="line">            src = src.replace(<span class="string">f&quot;args[<span class="subst">&#123;i+<span class="number">1</span>&#125;</span>]&quot;</span>, json.dumps(<span class="built_in">str</span>(arg)))</span><br><span class="line">    <span class="keyword">with</span> <span class="built_in">open</span>(out, <span class="string">&quot;w&quot;</span>) <span class="keyword">as</span> f:</span><br><span class="line">        f.write(src)</span><br></pre></td></tr></table></figure>
+<p>这意味着每个输出目录里都有一份<strong>完整的、带实际参数的脚本副本</strong>。几个月后回来看结果，打开脚本就知道当时跑了什么参数——不需要翻配置文件，不需要猜。</p>
+<h2 id="Snakefile：30-行入口">Snakefile：30 行入口</h2>
+<p>最终的 Snakefile 只有 30 行：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> rules.index <span class="keyword">import</span> RnaSeq</span><br><span class="line"></span><br><span class="line">container: <span class="string">&quot;env/rnaseq.sif&quot;</span></span><br><span class="line"></span><br><span class="line">config_file = Path(<span class="string">&quot;config&quot;</span>, <span class="string">&quot;config.yaml&quot;</span>)</span><br><span class="line">rnaseq = RnaSeq(config_file)</span><br><span class="line">rnaseq.bound_workflow(workflow)</span><br><span class="line"></span><br><span class="line">rule <span class="built_in">all</span>:</span><br><span class="line">    <span class="built_in">input</span>:</span><br><span class="line">        rnaseq.target_out(),</span><br><span class="line">    default_target: <span class="literal">True</span></span><br></pre></td></tr></table></figure>
+<p>读配置 → 构建对象树 → 绑定 Snakemake → 执行。整个流程的复杂度被封装在 <code>RnaSeq</code> 和 <code>RuleSet</code> 里，Snakefile 只做胶水。</p>
+<h2 id="收获">收获</h2>
+<ol>
+<li><strong>配置驱动的组合能力</strong>：30+ 分析模块通过 YAML DAG 任意组合，新增模块只需写一个 RuleSet 子类 + 注册到 ALL 字典</li>
+<li><strong>自文档化输出</strong>：脚本实例化让每个结果目录都是自包含的，可审计、可复现</li>
+<li><strong>动态与静态的平衡</strong>：Snakemake 负责执行和依赖管理（它的强项），Python 负责规则构建和模块编排（Snakemake 的弱项）</li>
+<li><strong>教训</strong>：框架的抽象层次需要克制。RuleSet 暴露的 <code>_export</code> 接口如果设计不好，下游模块就会反向依赖上游内部细节，失去组合的灵活性</li>
+</ol>
+<p>这个思路不只适用于生信——任何需要&quot;模块可组合、流程可配置&quot;的场景，都可以用类似的&quot;Python 对象动态构建 rule&quot;模式。</p>
+</article><div class="post-copyright"><div class="post-copyright__author_group"><div class="post-copyright__author_img"><img class="post-copyright__author_img_front" src= "/img/loading.gif" data-lazy-src="/img/logo.png"></div><div class="post-copyright__author_name">Shane Hu</div><div class="post-copyright__author_desc">自建 · 深入原理 · 科学计算</div></div><div class="post-tools" id="post-tools"><div class="post-tools-left"><div id="quit-box" onclick="RemoveRewardMask()"></div></div></div><div class="social-share"><a class="social-share-ico icon-qq" target="_blank" rel="noopener" href="https://connect.qq.com/widget/shareqq/index.html?url=https%3A%2F%2Fhs3434.github.io%2Fhs3434.github.io%2F2025%2F06%2F08%2Frnaseq-pipeline-engineering%2F&amp;title=%E4%B8%8D%E6%BB%A1%20Snakemake%20%E7%9A%84%E9%9D%99%E6%80%81%20rule%EF%BC%9F%E6%88%91%E7%94%A8%20Python%20%E5%AF%B9%E8%B1%A1%E5%8A%A8%E6%80%81%E6%9E%84%E5%BB%BA%E4%BA%86%E4%B8%80%E6%9D%A1%20RNA-seq%20%E6%B5%81%E6%B0%B4%E7%BA%BF&amp;desc=undefined&amp;summary=undefined&amp;site=%E4%B8%8D%E6%BB%A1%20Snakemake%20%E7%9A%84%E9%9D%99%E6%80%81%20rule%EF%BC%9F%E6%88%91%E7%94%A8%20Python%20%E5%AF%B9%E8%B1%A1%E5%8A%A8%E6%80%81%E6%9E%84%E5%BB%BA%E4%BA%86%E4%B8%80%E6%9D%A1%20RNA-seq%20%E6%B5%81%E6%B0%B4%E7%BA%BF&amp;pics=%2Fimg%2Fpwa%2Ffavicon.png" title="Share to QQ"><i class="solitude fab fa-qq"></i></a><a class="social-share-ico icon-weibo" target="_blank" rel="noopener" href="http://service.weibo.com/share/share.php?url=https%3A%2F%2Fhs3434.github.io%2Fhs3434.github.io%2F2025%2F06%2F08%2Frnaseq-pipeline-engineering%2F&amp;title=%E4%B8%8D%E6%BB%A1%20Snakemake%20%E7%9A%84%E9%9D%99%E6%80%81%20rule%EF%BC%9F%E6%88%91%E7%94%A8%20Python%20%E5%AF%B9%E8%B1%A1%E5%8A%A8%E6%80%81%E6%9E%84%E5%BB%BA%E4%BA%86%E4%B8%80%E6%9D%A1%20RNA-seq%20%E6%B5%81%E6%B0%B4%E7%BA%BF&amp;pic=%2Fimg%2Fpwa%2Ffavicon.png" title="Share to Weibo"><i class="solitude fab fa-weibo"></i></a><a class="social-share-ico icon-twitter" target="_blank" rel="noopener" href="https://twitter.com/intent/tweet?url=https%3A%2F%2Fhs3434.github.io%2Fhs3434.github.io%2F2025%2F06%2F08%2Frnaseq-pipeline-engineering%2F&amp;text=%E4%B8%8D%E6%BB%A1%20Snakemake%20%E7%9A%84%E9%9D%99%E6%80%81%20rule%EF%BC%9F%E6%88%91%E7%94%A8%20Python%20%E5%AF%B9%E8%B1%A1%E5%8A%A8%E6%80%81%E6%9E%84%E5%BB%BA%E4%BA%86%E4%B8%80%E6%9D%A1%20RNA-seq%20%E6%B5%81%E6%B0%B4%E7%BA%BF" title="Share to Twitter"><i class="solitude fab fa-twitter"></i></a><a class="social-share-ico icon-facebook" target="_blank" rel="noopener" href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fhs3434.github.io%2Fhs3434.github.io%2F2025%2F06%2F08%2Frnaseq-pipeline-engineering%2F" title="Share to Facebook"><i class="solitude fab fa-facebook"></i></a><a class="social-share-ico icon-telegram" target="_blank" rel="noopener" href="https://t.me/share/url?url=https%3A%2F%2Fhs3434.github.io%2Fhs3434.github.io%2F2025%2F06%2F08%2Frnaseq-pipeline-engineering%2F&amp;text=%E4%B8%8D%E6%BB%A1%20Snakemake%20%E7%9A%84%E9%9D%99%E6%80%81%20rule%EF%BC%9F%E6%88%91%E7%94%A8%20Python%20%E5%AF%B9%E8%B1%A1%E5%8A%A8%E6%80%81%E6%9E%84%E5%BB%BA%E4%BA%86%E4%B8%80%E6%9D%A1%20RNA-seq%20%E6%B5%81%E6%B0%B4%E7%BA%BF" title="Share to Telegram"><i class="solitude fab fa-telegram"></i></a><a class="social-share-ico icon-whatsapp" target="_blank" rel="noopener" href="https://api.whatsapp.com/send?text=%E4%B8%8D%E6%BB%A1%20Snakemake%20%E7%9A%84%E9%9D%99%E6%80%81%20rule%EF%BC%9F%E6%88%91%E7%94%A8%20Python%20%E5%AF%B9%E8%B1%A1%E5%8A%A8%E6%80%81%E6%9E%84%E5%BB%BA%E4%BA%86%E4%B8%80%E6%9D%A1%20RNA-seq%20%E6%B5%81%E6%B0%B4%E7%BA%BF https%3A%2F%2Fhs3434.github.io%2Fhs3434.github.io%2F2025%2F06%2F08%2Frnaseq-pipeline-engineering%2F" title="Share to WhatsApp"><i class="solitude fab fa-whatsapp"></i></a><a class="social-share-ico icon-linkedin" target="_blank" rel="noopener" href="https://www.linkedin.com/shareArticle?mini=true&amp;url=https%3A%2F%2Fhs3434.github.io%2Fhs3434.github.io%2F2025%2F06%2F08%2Frnaseq-pipeline-engineering%2F&amp;title=%E4%B8%8D%E6%BB%A1%20Snakemake%20%E7%9A%84%E9%9D%99%E6%80%81%20rule%EF%BC%9F%E6%88%91%E7%94%A8%20Python%20%E5%AF%B9%E8%B1%A1%E5%8A%A8%E6%80%81%E6%9E%84%E5%BB%BA%E4%BA%86%E4%B8%80%E6%9D%A1%20RNA-seq%20%E6%B5%81%E6%B0%B4%E7%BA%BF&amp;summary=undefined&amp;source=%E4%B8%8D%E6%BB%A1%20Snakemake%20%E7%9A%84%E9%9D%99%E6%80%81%20rule%EF%BC%9F%E6%88%91%E7%94%A8%20Python%20%E5%AF%B9%E8%B1%A1%E5%8A%A8%E6%80%81%E6%9E%84%E5%BB%BA%E4%BA%86%E4%B8%80%E6%9D%A1%20RNA-seq%20%E6%B5%81%E6%B0%B4%E7%BA%BF" title="Share to LinkedIn"><i class="solitude fab fa-linkedin"></i></a><div class="social-share-ico icon-link" onclick="utils.copy(&quot;https://hs3434.github.io/hs3434.github.io/2025/06/08/rnaseq-pipeline-engineering/&quot;)" title="Share to Link"><i class="solitude fas fa-link"></i></div><div class="social-share-ico icon-qrcode" title="Share to QR code"><i class="solitude fas fa-qrcode"></i><div class="share-main"><div class="share-main-all"><div id="qrcode"></div><div class="reward-dec">Share to QR code</div></div></div><script pjax>typeof QRCode === 'function' && new QRCode(document.getElementById("qrcode"), {
+    text: 'https://hs3434.github.io/hs3434.github.io/2025/06/08/rnaseq-pipeline-engineering/',
+    correctLevel : QRCode.CorrectLevel.L
+});
+window.addEventListener('DOMContentLoaded', () => {
+    new QRCode(document.getElementById("qrcode"), {
+        text: 'https://hs3434.github.io/hs3434.github.io/2025/06/08/rnaseq-pipeline-engineering/',
+        correctLevel : QRCode.CorrectLevel.L
+    });
+});
+</script></div></div><div class="post-copyright__notice"><span class="post-copyright-info">This piece of writing is an original article, utilizing the<a target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh-hans">CC BY-NC-SA 4.0</a>Agreement. For complete reproduction, please acknowledge the source as Courtesy of<a href="/">Shane Hu</a></span></div></div><div class="post-tools-right"><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/python/"><span class="tags-punctuation"><i class="solitude fas fa-hashtag"></i>python<span class="tagsPageCount">6</span></span></a><a class="post-meta__tags" href="/tags/snakemake/"><span class="tags-punctuation"><i class="solitude fas fa-hashtag"></i>snakemake<span class="tagsPageCount">2</span></span></a><a class="post-meta__tags" href="/tags/pipeline/"><span class="tags-punctuation"><i class="solitude fas fa-hashtag"></i>pipeline<span class="tagsPageCount">2</span></span></a><a class="post-meta__tags" href="/tags/bioinformatics/"><span class="tags-punctuation"><i class="solitude fas fa-hashtag"></i>bioinformatics<span class="tagsPageCount">1</span></span></a></div></div></div><nav class="needEndHide pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2026/06/08/slurm/"><div class="pagination-info"><div class="label">Previous</div><div class="prev_info">SLURM 集群安装配置</div></div></a></div><div class="next-post pull-right"><a href="/2025/06/08/eeg-signal-processing-toolchain/"><div class="pagination-info"><div class="label">Next</div><div class="next_info">从零搭一套端到端 EEG 信号处理工具链</div></div></a></div></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="card-content"><div class="card-info-avatar is-center"><div class="top-group"><div class="sayhi" id="sayhi" onclick="sco.changeWittyWord()"></div></div></div><div class="avatar"><img alt="Avatar" src= "/img/loading.gif" data-lazy-src="/img/head_porttrait.jpeg"></div><div class="description"></div><div class="bottom-group"><span class="left"><div class="name">Shane Hu</div><div class="desc">自建一切 · 深入原理 · 科学计算</div></span><div class="social-icons is-center"><a class="social-icon" target="_blank" rel="noopener" href="https://github.com/hs3434" title="Github"><i class="solitude  fab fa-github"></i></a></div></div></div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="solitude fas fa-bars"></i><span>Table of contents</span></div><div class="toc-content" id="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%83%8C%E6%99%AF"><span class="toc-text">背景</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%9E%B6%E6%9E%84%E6%80%BB%E8%A7%88"><span class="toc-text">架构总览</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%A0%B8%E5%BF%83%E8%AE%BE%E8%AE%A1"><span class="toc-text">核心设计</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-MyRule%EF%BC%9A%E4%BB%8E-Python-%E5%AF%B9%E8%B1%A1%E5%88%B0-Snakemake-rule"><span class="toc-text">1. MyRule：从 Python 对象到 Snakemake rule</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-RuleSet-Parameter%EF%BC%9A%E6%A8%A1%E5%9D%97%E9%97%B4%E6%95%B0%E6%8D%AE%E6%B5%81%E8%A7%A3%E8%80%A6"><span class="toc-text">2. RuleSet + Parameter：模块间数据流解耦</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-YAML-%E9%85%8D%E7%BD%AE%E9%A9%B1%E5%8A%A8-DAG"><span class="toc-text">3. YAML 配置驱动 DAG</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-%E8%84%9A%E6%9C%AC%E5%AE%9E%E4%BE%8B%E5%8C%96%EF%BC%9A%E8%87%AA%E6%96%87%E6%A1%A3%E5%8C%96%E7%9A%84%E8%BE%93%E5%87%BA"><span class="toc-text">4. 脚本实例化：自文档化的输出</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Snakefile%EF%BC%9A30-%E8%A1%8C%E5%85%A5%E5%8F%A3"><span class="toc-text">Snakefile：30 行入口</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%94%B6%E8%8E%B7"><span class="toc-text">收获</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="solitude fas fa-map"></i><span>New posts</span></div><div class="aside-list"><a class="aside-list-item" href="/2026/06/08/calculus/" title="高等数学笔记"><div class="thumbnail"><img alt="高等数学笔记" src= "/img/loading.gif" data-lazy-src="/img/default.png"></div><div class="content"><span class="title" href="/2026/06/08/calculus/" title="高等数学笔记">高等数学笔记</span><span class="categories" href="/2026/06/08/calculus/">mathematics</span></div></a><a class="aside-list-item" href="/2026/06/08/dev-env/" title="开发环境搭建"><div class="thumbnail"><img alt="开发环境搭建" src= "/img/loading.gif" data-lazy-src="/img/default.png"></div><div class="content"><span class="title" href="/2026/06/08/dev-env/" title="开发环境搭建">开发环境搭建</span><span class="categories" href="/2026/06/08/dev-env/">software</span></div></a><a class="aside-list-item" href="/2026/06/08/slurm/" title="SLURM 集群安装配置"><div class="thumbnail"><img alt="SLURM 集群安装配置" src= "/img/loading.gif" data-lazy-src="/img/default.png"></div><div class="content"><span class="title" href="/2026/06/08/slurm/" title="SLURM 集群安装配置">SLURM 集群安装配置</span><span class="categories" href="/2026/06/08/slurm/">software</span></div></a><a class="aside-list-item" href="/2025/06/08/rnaseq-pipeline-engineering/" title="不满 Snakemake 的静态 rule？我用 Python 对象动态构建了一条 RNA-seq 流水线"><div class="content"><span class="title" href="/2025/06/08/rnaseq-pipeline-engineering/" title="不满 Snakemake 的静态 rule？我用 Python 对象动态构建了一条 RNA-seq 流水线">不满 Snakemake 的静态 rule？我用 Python 对象动态构建了一条 RNA-seq 流水线</span><span class="categories" href="/2025/06/08/rnaseq-pipeline-engineering/">engineering</span></div></a><a class="aside-list-item" href="/2025/06/08/eeg-signal-processing-toolchain/" title="从零搭一套端到端 EEG 信号处理工具链"><div class="content"><span class="title" href="/2025/06/08/eeg-signal-processing-toolchain/" title="从零搭一套端到端 EEG 信号处理工具链">从零搭一套端到端 EEG 信号处理工具链</span><span class="categories" href="/2025/06/08/eeg-signal-processing-toolchain/">engineering</span></div></a></div></div></div></div></main><footer id="footer"><div id="st-footer-bar"><div class="footer-logo"><span>主页</span></div><div class="footer-bar-description">来自 Shane Hu 的文章</div><a class="footer-bar-link" href="/about/">了解更多</a></div><div id="footer-bar"><div class="footer-bar-links"><div class="footer-bar-left"><div class="copyright">© 2024 - 2026 By&nbsp;<a class="footer-bar-link" href="/"><img class="author-avatar" src= "/img/loading.gif" data-lazy-src="/img/pwa/favicon.png">Shane Hu</a></div><div class="beian-group"><a class="footer-bar-link" target="_blank" rel="noopener" href="https://hexo.io/">Framework: Hexo</a><a class="footer-bar-link" target="_blank" rel="noopener" href="https://github.com/everfu/hexo-theme-solitude">Theme: Solitude</a></div></div></div></div></footer></div><!-- right_menu--><!-- inject body--><div><script src="/js/utils.js?v=3.0.14"></script><script src="/js/main.js?v=3.0.14"></script><script src="/js/third_party/waterfall.min.js?v=3.0.14"></script><script src="https://fastly.jsdelivr.net/npm/pjax@0.2.8/pjax.min.js"></script><script src="https://fastly.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script><script src="https://fastly.jsdelivr.net/npm/mermaid@11.4.1/dist/mermaid.min.js"></script><script src="https://fastly.jsdelivr.net/npm/typeit@8.8.7/dist/index.umd.min.js"></script><script src="/js/third_party/universe.min.js?v=3.0.14"></script><script>dark()
+</script><script src="/js/tw_cn.js?v=3.0.14"></script><script src="https://fastly.jsdelivr.net/npm/katex@0.16.21/dist/contrib/copy-tex.min.js"><script>(() => {
+  document.querySelectorAll('.article-container span.katex-display').forEach(item => {
+    utils.wrap(item, 'div', {class: 'katex-wrap'})
+  })
+})();
+</script></script><script src="https://fastly.jsdelivr.net/npm/vanilla-lazyload@19.1.3/dist/lazyload.iife.min.js"></script><script src="https://fastly.jsdelivr.net/npm/node-snackbar@0.1.16/dist/snackbar.min.js"></script><script>window.paceOptions = {
+  restartOnPushState: false
+}
+
+utils.addGlobalFn('pjaxSend', () => {
+  Pace.restart()
+}, 'pace_restart')
+</script><script src="https://fastly.jsdelivr.net/npm/pace-js@1.2.4/pace.min.js"></script><div class="js-pjax"><script>mermaid.run();
+</script></div></div><!-- pjax--><script>const pjax = new Pjax({
+    elements: 'a:not([target="_blank"])',
+    selectors: ["title","#body-wrap","#site-config","meta[name=\"description\"]",".js-pjax","meta[property^=\"og:\"]","#config-diff",".rs_show",".rs_hide"],
+    cacheBust: false,
+    analytics: false,
+    scrollRestoration: false
+})
+
+document.querySelectorAll('script[data-pjax]').forEach(item => {
+    const newScript = document.createElement('script')
+    const content = item.text || item.textContent || item.innerHTML || ""
+    Array.from(item.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value))
+    newScript.appendChild(document.createTextNode(content))
+    item.parentNode.replaceChild(newScript, item)
+})
+
+document.addEventListener('pjax:complete', () => {
+    window.refreshFn()
+
+    document.querySelectorAll('script[data-pjax]').forEach(item => {
+        const newScript = document.createElement('script')
+        const content = item.text || item.textContent || item.innerHTML || ""
+        Array.from(item.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value))
+        newScript.appendChild(document.createTextNode(content))
+        item.parentNode.replaceChild(newScript, item)
+    })
+
+    GLOBAL_CONFIG.islazyload && window.lazyLoadInstance.update()
+
+})
+
+document.addEventListener('pjax:error', (e) => {
+    if (e.request.status === 404) {
+        pjax.loadUrl('/404.html')
+    }
+})</script><!-- google adsense--><!-- search--><!-- music--></body></html>
+        <script>
+            const posts = ["2026/06/08/calculus/","2026/06/08/dev-env/","2026/06/08/slurm/","2025/06/08/rnaseq-pipeline-engineering/","2025/06/08/eeg-signal-processing-toolchain/","2025/06/08/transformer-eeg-decoding/","2025/03/06/250306/","2025/03/03/transformer1/","2024/06/20/2406202/","2024/06/20/240620/","2024/06/19/240619/","2024/06/06/vps-proxy/","2024/06/06/solitude/","2024/06/05/udesk2/","2024/06/05/udesk1/","2024/06/04/Advanced-Algebra/","2024/06/04/server/","2024/06/04/font/","2024/06/04/ydns/","2024/06/04/conda/","2024/06/04/bind9/","2024/06/04/openwrt/","2024/06/04/ssl/","2024/06/03/hexo/"];
+            function toRandomPost() {
+                const randomPost = posts[Math.floor(Math.random() * posts.length)];
+                pjax.loadUrl(GLOBAL_CONFIG.root + randomPost);
+            }
+        </script>

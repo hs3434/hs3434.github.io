@@ -1,0 +1,335 @@
+<!DOCTYPE html><html lang="en" data-theme="light"><head><meta charset="utf-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1"><title>GPT 风格 Transformer 解码 EEG：为什么、怎么做、踩了什么坑 | Shane Hu</title><noscript>Please enable JavaScript to view the site</noscript><link rel="icon" href="/img/pwa/favicon.png"><!-- index.css--><link rel="stylesheet" href="/css/index.css?v=3.0.14"><!-- inject head--><link rel="canonical" href="https://hs3434.github.io/hs3434.github.io/2025/06/08/transformer-eeg-decoding/index.html"><link rel="stylesheet" href="https://fastly.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.7.2/css/all.min.css"><!-- aplayer--><!-- swiper--><!-- fancybox ui--><!-- katex--><link rel="stylesheet" href="https://fastly.jsdelivr.net/npm/katex@0.16.21/dist/katex.min.css"><!-- Open Graph--><meta name="description" content="为什么用 Transformer 解码 EEG EEG 解码的传统方法是 LDA + CSP：手工提取特征，再喂给线性分类器。这条路成熟但天花板明显——特征工程依赖领域知识，换一个范式就得重来。 深度学习跳过了特征工程：CNN 直接从原始信号学特征。但 CNN 有自己的局限——它的卷积核是局部的，对"><!-- pwa--><meta name="apple-mobile-web-app-capable" content="Shane Hu"><meta name="theme-color" content="var(--efu-main)"><meta name="apple-mobile-web-app-status-bar-style" content="var(--efu-main)"><link rel="bookmark" href="/img/pwa/favicon.png"><link rel="apple-touch-icon" href="/img/pwa/favicon.png" sizes="180x180"><script>console.log(' %c Solitude %c ' + '3.0.14' + ' %c https://github.com/everfu/hexo-theme-solitude',
+    'background:#35495e ; padding: 1px; border-radius: 3px 0 0 3px;  color: #fff',
+    'background:#ff9a9a ; padding: 1px; border-radius: 0 3px 3px 0;  color: #fff',
+    'background:unset ; padding: 1px; border-radius: 0 3px 3px 0;  color: #fff')
+</script><script>let mdate = "7-7,9-18,12-13";
+mdate = (mdate.split(","));
+let ndate = new Date();
+for (let i of mdate) {
+    if (i === (ndate.getMonth()+1) + "-" + (ndate.getDate())) {
+        document.documentElement.classList.add('memorial');
+    }
+}
+</script><script>(()=>{
+        const saveToLocal = {
+            set: function setWithExpiry(key, value, ttl) {
+                if (ttl === 0)
+                    return
+                const now = new Date()
+                const expiryDay = ttl * 86400000
+                const item = {
+                    value: value,
+                    expiry: now.getTime() + expiryDay
+                }
+                localStorage.setItem(key, JSON.stringify(item))
+            },
+            get: function getWithExpiry(key) {
+                const itemStr = localStorage.getItem(key)
+
+                if (!itemStr) {
+                    return undefined
+                }
+                const item = JSON.parse(itemStr)
+                const now = new Date()
+
+                if (now.getTime() > item.expiry) {
+                    localStorage.removeItem(key)
+                    return undefined
+                }
+                return item.value
+            }
+        };
+        window.utils = {
+            saveToLocal: saveToLocal,
+            getCSS: (url, id = false) => new Promise((resolve, reject) => {
+              const link = document.createElement('link')
+              link.rel = 'stylesheet'
+              link.href = url
+              if (id) link.id = id
+              link.onerror = reject
+              link.onload = link.onreadystatechange = function() {
+                const loadState = this.readyState
+                if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+                link.onload = link.onreadystatechange = null
+                resolve()
+              }
+              document.head.appendChild(link)
+            }),
+            getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+              const script = document.createElement('script')
+              script.src = url
+              script.async = true
+              script.onerror = reject
+              script.onload = script.onreadystatechange = function() {
+                const loadState = this.readyState
+                if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+                script.onload = script.onreadystatechange = null
+                resolve()
+              }
+
+              Object.keys(attr).forEach(key => {
+                script.setAttribute(key, attr[key])
+              })
+
+              document.head.appendChild(script)
+            }),
+            addGlobalFn: (key, fn, name = false, parent = window) => {
+                const globalFn = parent.globalFn || {}
+                const keyObj = globalFn[key] || {}
+
+                if (name && keyObj[name]) return
+
+                name = name || Object.keys(keyObj).length
+                keyObj[name] = fn
+                globalFn[key] = keyObj
+                parent.globalFn = globalFn
+            },
+            addEventListenerPjax: (ele, event, fn, option = false) => {
+              ele.addEventListener(event, fn, option)
+              utils.addGlobalFn('pjax', () => {
+                  ele.removeEventListener(event, fn, option)
+              })
+          },
+        }
+    })()</script><!-- theme--><script>initTheme = () => {
+    let isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches
+    const cachedMode = utils.saveToLocal.get('theme');
+    if (cachedMode === undefined) {
+        const nowMode =
+            isDarkMode ? 'dark' : 'light'
+        document.documentElement.setAttribute('data-theme', nowMode);
+    } else {
+        document.documentElement.setAttribute('data-theme', cachedMode);
+    }
+    typeof rm === 'object' && rm.mode(cachedMode === 'dark' && isDarkMode)
+}
+initTheme()</script><!-- global head--><script>const GLOBAL_CONFIG = {
+    root: '/',
+    algolia: undefined,
+    localsearch: undefined,
+    runtime: '2024-06-03 00:00:00',
+    lazyload: {
+        enable: true,
+        error: '/img/error_load.avif'
+    },
+    copyright: {"limit":50,"author":"Author: Shane Hu","link":"Link: ","source":"Source: Shane Hu","info":"Copyright is owned by the author. For commercial reprints, please contact the author for authorization. For non-commercial reprints, please indicate the source."},
+    highlight: {"limit":200,"expand":true,"copy":true,"syntax":"highlight.js"},
+    randomlink: false,
+    lang: {"theme":{"dark":"Dark","light":"Light"},"copy":{"success":"Copied","error":"Copy failed"},"backtop":"Back to top","time":{"day":" days ago","hour":" hours ago","just":"just","min":" minutes ago","month":" months ago"},"day":" days","f12":"Developer mode is turned on, please follow the GPL.","totalk":"You don't need to delete blank lines, just type in your comments."},
+    aside: {
+        state: {
+            morning: "✨ 早上好，新的一天开始了",
+            noon: "🍲 午餐时间",
+            afternoon: "🌞 下午好",
+            night: "早点休息",
+            goodnight: "晚安 😴",
+        },
+        witty_words: [],
+        witty_comment: {
+            prefix: 'Long time no see, ',
+            back: 'Welcome back again,',
+        },
+    },
+    covercolor: {
+        enable: false
+    },
+    comment: false,
+    lightbox: 'null',
+    right_menu: false,
+    translate: {"translateDelay":0,"defaultEncoding":2},
+    lure: false,
+    expire: false,
+};</script><!-- page-config head--><script id="config-diff">var PAGE_CONFIG = {
+    is_post: true,
+    is_page: false,
+    is_home: false,
+    page: '',
+    toc: true,
+    comment: false,
+    ai_text: false,
+    color: false,
+}</script><meta name="generator" content="Hexo 7.3.0"></head><body id="body"><!-- universe--><canvas id="universe"></canvas><!-- background img--><!-- loading--><!-- console--><!-- sidebar--><div id="sidebar" style="zoom: 1;"><div id="menu-mask" style="display: none;"></div><div id="sidebar-menus"><div class="site-data"><div class="data-item is-center"><div class="data-item-link"><a href="/archives/"><div class="headline">Archives</div><div class="length-num">24</div></a></div></div><div class="data-item is-center"><div class="data-item-link"><a href="/categories/"><div class="headline">Categories</div><div class="length-num">9</div></a></div></div><div class="data-item is-center"><div class="data-item-link"><a href="/tags/"><div class="headline">Tags</div><div class="length-num">43</div></a></div></div></div><span class="sidebar-menu-item-title">Function</span><div class="sidebar-menu-item"><span class="darkmode_switchbutton menu-child" onclick="sco.switchDarkMode()"><i class="solitude fas fa-circle-half-stroke"></i><span>Display mode</span></span></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="javascript:void(0);"><span>文库</span></a><ul class="menus_item_child"><li><a class="site-page child" href="/archives/"><i class="solitude  fas fa-folder-closed"></i><span>全部文章</span></a></li><li><a class="site-page child" href="/categories/"><i class="solitude  fas fa-clone"></i><span>全部分类</span></a></li><li><a class="site-page child" href="/tags/"><i class="solitude  fas fa-tags"></i><span>全部标签</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="javascript:void(0);"><span>关于</span></a><ul class="menus_item_child"><li><a class="site-page child" href="/about/"><i class="solitude  st-contacts-fill"></i><span>自我介绍</span></a></li><li><a class="site-page child" href="/projects/"><i class="solitude  fas fa-code"></i><span>项目作品</span></a></li></ul></div></div><span class="sidebar-menu-item-title">Tags</span><div class="card-tags"><div class="card-tag-cloud"><a href="/tags/web/">web<sup>1</sup></a><a href="/tags/http/">http<sup>1</sup></a><a href="/tags/debian/">debian<sup>1</sup></a><a href="/tags/dns/">dns<sup>2</sup></a><a href="/tags/53port/">53port<sup>1</sup></a><a href="/tags/socks5/">socks5<sup>1</sup></a><a href="/tags/Dante/">Dante<sup>1</sup></a><a href="/tags/algebra/">algebra<sup>1</sup></a><a href="/tags/mathematics/">mathematics<sup>2</sup></a><a href="/tags/bind9/">bind9<sup>1</sup></a><a href="/tags/conda/">conda<sup>2</sup></a><a href="/tags/Fonts/">Fonts<sup>1</sup></a><a href="/tags/OpenWRT/">OpenWRT<sup>1</sup></a><a href="/tags/hexo/">hexo<sup>2</sup></a><a href="/tags/server/">server<sup>1</sup></a><a href="/tags/vps/">vps<sup>2</sup></a><a href="/tags/theme/">theme<sup>1</sup></a><a href="/tags/ssl/">ssl<sup>1</sup></a><a href="/tags/AI-pytorch/">AI pytorch<sup>1</sup></a><a href="/tags/jottings/">jottings<sup>2</sup></a><a href="/tags/python/">python<sup>6</sup></a><a href="/tags/mysql/">mysql<sup>2</sup></a><a href="/tags/api/">api<sup>2</sup></a><a href="/tags/udesk/">udesk<sup>2</sup></a><a href="/tags/ydns/">ydns<sup>1</sup></a><a href="/tags/ddns/">ddns<sup>1</sup></a><a href="/tags/vscode/">vscode<sup>1</sup></a><a href="/tags/R/">R<sup>2</sup></a><a href="/tags/xray/">xray<sup>1</sup></a><a href="/tags/snakemake/">snakemake<sup>2</sup></a><a href="/tags/pipeline/">pipeline<sup>2</sup></a><a href="/tags/bioinformatics/">bioinformatics<sup>1</sup></a><a href="/tags/calculus/">calculus<sup>1</sup></a><a href="/tags/dev/">dev<sup>1</sup></a><a href="/tags/slurm/">slurm<sup>1</sup></a><a href="/tags/hpc/">hpc<sup>1</sup></a><a href="/tags/cluster/">cluster<sup>1</sup></a><a href="/tags/eeg/">eeg<sup>2</sup></a><a href="/tags/qt/">qt<sup>1</sup></a><a href="/tags/mne/">mne<sup>1</sup></a><a href="/tags/pytorch/">pytorch<sup>1</sup></a><a href="/tags/transformer/">transformer<sup>1</sup></a><a href="/tags/deep-learning/">deep-learning<sup>1</sup></a></div></div></div></div><!-- keyboard--><!-- righhtside--><div class="post" id="body-wrap"><header class="not-top-img" id="page-header"><nav class="show" id="nav"><div id="nav-group"><div id="blog_name"><a id="site-name" href="/" title="Back to home"><span class="title">主页</span><i class="solitude fas fa-home"></i></a></div><div id="page-name-mask"><div id="page-name"><a id="page-name-text" onclick="sco.toTop()">GPT 风格 Transformer 解码 EEG：为什么、怎么做、踩了什么坑</a></div></div><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="javascript:void(0);"><span>文库</span></a><ul class="menus_item_child"><li><a class="site-page child" href="/archives/"><i class="solitude  fas fa-folder-closed"></i><span>全部文章</span></a></li><li><a class="site-page child" href="/categories/"><i class="solitude  fas fa-clone"></i><span>全部分类</span></a></li><li><a class="site-page child" href="/tags/"><i class="solitude  fas fa-tags"></i><span>全部标签</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="javascript:void(0);"><span>关于</span></a><ul class="menus_item_child"><li><a class="site-page child" href="/about/"><i class="solitude  st-contacts-fill"></i><span>自我介绍</span></a></li><li><a class="site-page child" href="/projects/"><i class="solitude  fas fa-code"></i><span>项目作品</span></a></li></ul></div></div></div><div id="nav-left"></div><div id="nav-right"><div class="nav-button" id="nav-totop" onclick="sco.toTop()"><a class="totopbtn"><i class="solitude fas fa-arrow-up"></i><span id="percent">0</span></a></div><div id="toggle-menu"><a class="site-page"><i class="solitude fas fa-bars"></i></a></div></div></div></nav></header><main class="layout" id="content-inner"><div id="post"><div id="post-info"><div id="post-firstinfo"><div class="meta-firstline"><a class="post-meta-original" title="This article is a Original article, pay attention to the copyright.">Original</a><span class="post-meta-categories"><a class="post-meta-categories" href="/categories/deep-learning/">deep-learning</a></span><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/eeg/"><span class="tags-name tags-punctuation"><i class="solitude fas fa-hashtag"></i>eeg</span></a><a class="post-meta__tags" href="/tags/pytorch/"><span class="tags-name tags-punctuation"><i class="solitude fas fa-hashtag"></i>pytorch</span></a><a class="post-meta__tags" href="/tags/transformer/"><span class="tags-name tags-punctuation"><i class="solitude fas fa-hashtag"></i>transformer</span></a><a class="post-meta__tags" href="/tags/deep-learning/"><span class="tags-name tags-punctuation"><i class="solitude fas fa-hashtag"></i>deep-learning</span></a></div></div></div></div><h1 class="post-title">GPT 风格 Transformer 解码 EEG：为什么、怎么做、踩了什么坑</h1><div id="post-meta"><div class="meta-secondline"><span class="post-meta-date" title="Posted on 2025-06-08 00:00:00"><i class="post-meta-icon solitude fas fa-calendar-days"></i><time datetime="2025-06-07T16:00:00.000Z">2025-06-07T16:00:00.000Z</time></span><span class="post-meta-date" title="Last updated on 2026-06-08 17:42:35"><i class="post-meta-icon solitude fas fa-arrows-rotate"></i><time datetime="2026-06-08T09:42:35.209Z">2026-06-08T09:42:35.209Z</time></span><span class="post-meta-position" title="The author's IP belongs toChina"><i class="post-meta-icon solitude fas fa-location-dot"></i><span>China</span></span></div></div></div><div id="post-info-bottom"></div><article class="post-content article-container"><h2 id="为什么用-Transformer-解码-EEG">为什么用 Transformer 解码 EEG</h2>
+<p>EEG 解码的传统方法是 LDA + CSP：手工提取特征，再喂给线性分类器。这条路成熟但天花板明显——特征工程依赖领域知识，换一个范式就得重来。</p>
+<p>深度学习跳过了特征工程：CNN 直接从原始信号学特征。但 CNN 有自己的局限——它的卷积核是局部的，对 EEG 这种时序信号的长程依赖建模能力弱。</p>
+<p>Transformer 的自注意力机制天然擅长捕捉长程依赖。NLP 领域已经证明了这一点。问题是：<strong>把 NLP 的 Transformer 搬到 EEG 上，哪些设计要改？</strong></p>
+<p>答案是几乎全要改。</p>
+<h2 id="EEG-不是-NLP：三个关键差异">EEG 不是 NLP：三个关键差异</h2>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>NLP</th>
+<th>EEG</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>输入</td>
+<td>离散 token（词表索引）</td>
+<td>连续多通道时序（float32 数组）</td>
+</tr>
+<tr>
+<td>位置信息</td>
+<td>词序（离散位置）</td>
+<td>采样时间点（连续，长度可变）</td>
+</tr>
+<tr>
+<td>预测目标</td>
+<td>下一个词（自回归生成）</td>
+<td>整段信号属于哪类（分类）</td>
+</tr>
+</tbody>
+</table>
+<p>这三个差异决定了架构的每一个选择。</p>
+<h2 id="架构设计">架构设计</h2>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">原始 EEG (n_channels, n_times)</span><br><span class="line">        │</span><br><span class="line">        ▼</span><br><span class="line">  Conv1d Token Embedding ──→ (n_tokens, n_channels)</span><br><span class="line">        │</span><br><span class="line">        ▼</span><br><span class="line">  Linear Projection ──→ (n_tokens, d_model)</span><br><span class="line">        │</span><br><span class="line">        ▼</span><br><span class="line">  N × Decoder Block</span><br><span class="line">  ┌─────────────────────┐</span><br><span class="line">  │  LayerNorm           │</span><br><span class="line">  │  Causal MHA + RoPE   │</span><br><span class="line">  │  Residual            │</span><br><span class="line">  │  LayerNorm           │</span><br><span class="line">  │  FFN (4× expansion)  │</span><br><span class="line">  │  Residual            │</span><br><span class="line">  └─────────────────────┘</span><br><span class="line">        │</span><br><span class="line">        ▼</span><br><span class="line">  取最后位置 → Linear → n_classes</span><br></pre></td></tr></table></figure>
+<h3 id="1-Token-Embedding：不用词表，用卷积">1. Token Embedding：不用词表，用卷积</h3>
+<p>NLP 有词表，每个词查表得到 embedding。EEG 没有词表——输入是 <code>(n_channels, n_times)</code> 的连续信号。</p>
+<p>做法：用 <code>Conv1d(n_channels, n_channels, kernel, stride)</code> 把时域信号切成 token 序列。每个 token 覆盖 <code>kernel</code> 个时间点，步长 <code>stride</code>，输出的序列长度就是 <code>n_tokens = (n_times - kernel) // stride + 1</code>。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">_TokenEmbedding</span>(nn.Module):</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params">self, n_channels, kernel, stride</span>):</span><br><span class="line">        <span class="built_in">super</span>().__init__()</span><br><span class="line">        <span class="variable language_">self</span>.conv = nn.Conv1d(n_channels, n_channels,</span><br><span class="line">                              kernel_size=kernel, stride=stride)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">forward</span>(<span class="params">self, x</span>):</span><br><span class="line">        <span class="comment"># x: (B, n_ch, n_times) → (B, n_tokens, n_ch)</span></span><br><span class="line">        <span class="keyword">return</span> <span class="variable language_">self</span>.conv(x).transpose(<span class="number">1</span>, <span class="number">2</span>)</span><br></pre></td></tr></table></figure>
+<p><strong>为什么用 Conv1d 而不是固定分帧</strong>：信号处理里&quot;分帧&quot;是按固定窗口切信号、每帧取均值或原始采样点——这是不可学习的。Conv1d 做的事本质相同（kernel=窗口，stride=步长），但权重可学习：kernel 内每个时间点的贡献由训练决定，比分帧平均更有表达力。</p>
+<p><strong>kernel/stride 怎么选</strong>：如果用户不指定，自动算。目标是让 <code>n_tokens ≈ 128</code>，50% 重叠（<code>kernel = 2 * stride</code>）：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">stride = <span class="built_in">max</span>(<span class="number">1</span>, n_times // target_tokens)</span><br><span class="line">kernel = stride * <span class="number">2</span></span><br></pre></td></tr></table></figure>
+<p>128 个 token 足够 Transformer 捕捉时序依赖，又不会让 O(N²) 的注意力计算爆炸。</p>
+<h3 id="2-RoPE：让位置编码外推">2. RoPE：让位置编码外推</h3>
+<p>NLP 用固定的正弦位置编码或可学习的位置编码。问题：可学习位置编码只能编码训练时见过的长度，推理时遇到更长序列就废了。</p>
+<p>RoPE（Rotary Positional Embedding）是更好的选择：它把位置信息编码成 Q/K 的旋转角度，天然支持长度外推——训练时见 128 个 token，推理时给 200 个也能跑。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">_RotaryPositionalEmbedding</span>(nn.Module):</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params">self, d_model, max_seq_len=<span class="number">4096</span>, base=<span class="number">10000.0</span></span>):</span><br><span class="line">        <span class="built_in">super</span>().__init__()</span><br><span class="line">        inv_freq = <span class="number">1.0</span> / (base ** (torch.arange(<span class="number">0</span>, d_model, <span class="number">2</span>).<span class="built_in">float</span>() / d_model))</span><br><span class="line">        <span class="variable language_">self</span>.register_buffer(<span class="string">&quot;inv_freq&quot;</span>, inv_freq, persistent=<span class="literal">False</span>)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">forward</span>(<span class="params">self, x, positions</span>):</span><br><span class="line">        freqs = torch.outer(positions.<span class="built_in">float</span>(), <span class="variable language_">self</span>.inv_freq)</span><br><span class="line">        cos = freqs.cos().repeat_interleave(<span class="number">2</span>, dim=-<span class="number">1</span>)</span><br><span class="line">        sin = freqs.sin().repeat_interleave(<span class="number">2</span>, dim=-<span class="number">1</span>)</span><br><span class="line">        <span class="keyword">return</span> x * cos + <span class="variable language_">self</span>._rotate_half(x) * sin</span><br></pre></td></tr></table></figure>
+<p>核心思想：位置 m 的 Q/K 不加偏置，而是旋转。<code>_rotate_half</code> 把特征维的相邻两个值当作一对，做 2D 旋转。内积 <code>Q·K</code> 自然包含相对位置信息 <code>m-n</code>，不需要显式的位置编码表。</p>
+<h3 id="3-因果注意力：只看过去，不看未来">3. 因果注意力：只看过去，不看未来</h3>
+<p>这是 GPT 风格 Transformer 的标志性设计。标准 BERT 式自注意力每个位置能看所有位置，但 EEG 解码如果用双向注意力，模型会&quot;偷看&quot;未来的脑电信号——这在实时 BCI 场景下是不可能的。</p>
+<p>因果掩码：上三角为 <code>-inf</code>，softmax 后变成 0：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">_CausalMask</span>(nn.Module):</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params">self, size</span>):</span><br><span class="line">        <span class="built_in">super</span>().__init__()</span><br><span class="line">        mask = torch.triu(torch.full((size, size), <span class="built_in">float</span>(<span class="string">&quot;-inf&quot;</span>)), diagonal=<span class="number">1</span>)</span><br><span class="line">        <span class="variable language_">self</span>.register_buffer(<span class="string">&quot;mask&quot;</span>, mask, persistent=<span class="literal">False</span>)</span><br></pre></td></tr></table></figure>
+<p>在注意力分数上加这个掩码，位置 t 只能 attend 到 0…t。</p>
+<h3 id="4-Pre-LN-残差：稳定训练">4. Pre-LN + 残差：稳定训练</h3>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">_DecoderBlock</span>(nn.Module):</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">forward</span>(<span class="params">self, x</span>):</span><br><span class="line">        x = x + <span class="variable language_">self</span>.attn(<span class="variable language_">self</span>.ln1(x))   <span class="comment"># Pre-LN: 先归一化再进注意力</span></span><br><span class="line">        x = x + <span class="variable language_">self</span>.ffn(<span class="variable language_">self</span>.ln2(x))     <span class="comment"># 同理</span></span><br><span class="line">        <span class="keyword">return</span> x</span><br></pre></td></tr></table></figure>
+<p>Pre-LN（先 LayerNorm 再进子层）比 Post-LN（先子层再 LayerNorm）训练更稳定。这是 GPT-2 以后的标准做法。FFN 扩张比 4×，用 GELU 激活。</p>
+<h3 id="5-分类头：取最后一个位置">5. 分类头：取最后一个位置</h3>
+<p>BERT 取 <code>[CLS]</code> token 的输出做分类。GPT 没有 CLS，那取哪个位置？</p>
+<p>取最后一个：<code>x[:, -1, :]</code>。因为因果注意力下，最后一个位置积累了前面所有位置的信息——它&quot;看&quot;了整段信号。</p>
+<h3 id="6-长度自适应推理">6. 长度自适应推理</h3>
+<p>推理时 EEG 长度可能和训练时不一样。因为用了 Conv1d token embedding + RoPE，模型天然支持任意长度输入（只要 <code>n_times &gt;= kernel</code>）。如果推理时 token 数超过训练时，RoPE 的位置会外推，给一个警告：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> n_tokens &gt; <span class="variable language_">self</span>._train_n_tokens:</span><br><span class="line">    warnings.warn(<span class="string">&quot;RoPE position extrapolation; accuracy may degrade&quot;</span>)</span><br></pre></td></tr></table></figure>
+<h3 id="7-逐通道-z-score-归一化">7. 逐通道 z-score 归一化</h3>
+<p>EEG 通道间的幅度差异很大（额区 vs 枕区），不归一化的话梯度会被大信号通道主导。训练时计算每个通道的均值/标准差，推理时用同样的统计量：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> <span class="variable language_">self</span>.normalize:</span><br><span class="line">    <span class="variable language_">self</span>._mean = X.mean(axis=(<span class="number">0</span>, <span class="number">2</span>), keepdims=<span class="literal">True</span>)</span><br><span class="line">    <span class="variable language_">self</span>._std = X.std(axis=(<span class="number">0</span>, <span class="number">2</span>), keepdims=<span class="literal">True</span>)</span><br><span class="line">    <span class="variable language_">self</span>._std = np.where(<span class="variable language_">self</span>._std &lt; <span class="number">1e-8</span>, <span class="number">1.0</span>, <span class="variable language_">self</span>._std)  <span class="comment"># 零方差通道保护</span></span><br><span class="line">    X = (X - <span class="variable language_">self</span>._mean) / <span class="variable language_">self</span>._std</span><br></pre></td></tr></table></figure>
+<p>均值和标准差随模型一起保存，推理时自动应用。</p>
+<h2 id="和-CNN-解码器的对比">和 CNN 解码器的对比</h2>
+<p>同项目里还有一个 CNN 解码器作为对照：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># CNN: 输入 (B, 1, n_ch, n_times)，2D 卷积，全连接分类</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">_EEGCNN</span>(nn.Module):</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params">self, n_channels, n_times, n_classes, dropout=<span class="number">0.25</span></span>):</span><br><span class="line">        <span class="variable language_">self</span>.conv1 = nn.Conv2d(<span class="number">1</span>, <span class="number">16</span>, kernel_size=(n_channels, <span class="number">3</span>))</span><br><span class="line">        <span class="variable language_">self</span>.conv2 = nn.Conv2d(<span class="number">16</span>, <span class="number">32</span>, kernel_size=(<span class="number">1</span>, <span class="number">3</span>))</span><br><span class="line">        <span class="variable language_">self</span>.fc = nn.Linear(flatten_size, n_classes)</span><br></pre></td></tr></table></figure>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>CNN</th>
+<th>Transformer</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>输入视角</td>
+<td>把 EEG 当&quot;图像&quot;（1×n_ch×n_times）</td>
+<td>把 EEG 当&quot;时序&quot;（n_tokens×d_model）</td>
+</tr>
+<tr>
+<td>感受野</td>
+<td>局部（卷积核 3）</td>
+<td>全局（自注意力看所有 token）</td>
+</tr>
+<tr>
+<td>长度灵活性</td>
+<td>固定（全连接层绑死 n_times）</td>
+<td>自适应（RoPE 外推）</td>
+</tr>
+<tr>
+<td>训练开销</td>
+<td>小（参数少，全批量）</td>
+<td>大（O(N²) 注意力，需 mini-batch）</td>
+</tr>
+</tbody>
+</table>
+<p>CNN 快但天花板低，Transformer 慢但上限高。实际选择看数据量和计算资源。</p>
+<h2 id="训练细节">训练细节</h2>
+<ul>
+<li>优化器：AdamW（lr=5e-4, weight_decay=1e-4）</li>
+<li>损失：CrossEntropyLoss</li>
+<li>不用 DataLoader——数据直接放 GPU，手动 shuffle index 切 mini-batch，省掉 dataloader 的开销</li>
+<li>默认 50 epoch，batch_size=32</li>
+</ul>
+<h2 id="踩过的坑">踩过的坑</h2>
+<ol>
+<li><strong>EEG 数据量太小</strong>：BCI 数据集通常几十到几百个 trial，Transformer 容易过拟合。数据增强（高斯噪声、时间平移）很重要</li>
+<li><strong>RoPE 外推不是免费的</strong>：推理时 token 数超过训练时的 1.5 倍以上，准确率会明显下降。不是&quot;支持任意长度&quot;就真的随便用</li>
+<li><strong>d_model 不要太大</strong>：EEG 通道数通常 32-64，d_model=64 已经够用。512 是 NLP 的配置，在 EEG 上只会过拟合</li>
+<li><strong>因果注意力不一定比双向好</strong>：离线分析场景下，双向注意力允许&quot;偷看未来&quot;，准确率更高。因果注意力的价值在实时 BCI——只有实时场景才真正需要&quot;不能看未来&quot;的约束</li>
+</ol>
+<h2 id="总结">总结</h2>
+<p>把 Transformer 从 NLP 搬到 EEG，不是换个输入格式就完了。Token 怎么构建、位置怎么编码、注意力要不要因果、分类头取哪个位置——每个设计选择都需要根据 EEG 的特性重新思考。</p>
+<p>这个实现不是 SOTA（BCI 领域的 SOTA 是 EEGNet + 数据增强），但它完整地回答了一个问题：<strong>如果要从零实现一个 EEG Transformer，需要做哪些设计决策，以及为什么。</strong></p>
+</article><div class="post-copyright"><div class="post-copyright__author_group"><div class="post-copyright__author_img"><img class="post-copyright__author_img_front" src= "/img/loading.gif" data-lazy-src="/img/logo.png"></div><div class="post-copyright__author_name">Shane Hu</div><div class="post-copyright__author_desc">自建 · 深入原理 · 科学计算</div></div><div class="post-tools" id="post-tools"><div class="post-tools-left"><div id="quit-box" onclick="RemoveRewardMask()"></div></div></div><div class="social-share"><a class="social-share-ico icon-qq" target="_blank" rel="noopener" href="https://connect.qq.com/widget/shareqq/index.html?url=https%3A%2F%2Fhs3434.github.io%2Fhs3434.github.io%2F2025%2F06%2F08%2Ftransformer-eeg-decoding%2F&amp;title=GPT%20%E9%A3%8E%E6%A0%BC%20Transformer%20%E8%A7%A3%E7%A0%81%20EEG%EF%BC%9A%E4%B8%BA%E4%BB%80%E4%B9%88%E3%80%81%E6%80%8E%E4%B9%88%E5%81%9A%E3%80%81%E8%B8%A9%E4%BA%86%E4%BB%80%E4%B9%88%E5%9D%91&amp;desc=undefined&amp;summary=undefined&amp;site=GPT%20%E9%A3%8E%E6%A0%BC%20Transformer%20%E8%A7%A3%E7%A0%81%20EEG%EF%BC%9A%E4%B8%BA%E4%BB%80%E4%B9%88%E3%80%81%E6%80%8E%E4%B9%88%E5%81%9A%E3%80%81%E8%B8%A9%E4%BA%86%E4%BB%80%E4%B9%88%E5%9D%91&amp;pics=%2Fimg%2Fpwa%2Ffavicon.png" title="Share to QQ"><i class="solitude fab fa-qq"></i></a><a class="social-share-ico icon-weibo" target="_blank" rel="noopener" href="http://service.weibo.com/share/share.php?url=https%3A%2F%2Fhs3434.github.io%2Fhs3434.github.io%2F2025%2F06%2F08%2Ftransformer-eeg-decoding%2F&amp;title=GPT%20%E9%A3%8E%E6%A0%BC%20Transformer%20%E8%A7%A3%E7%A0%81%20EEG%EF%BC%9A%E4%B8%BA%E4%BB%80%E4%B9%88%E3%80%81%E6%80%8E%E4%B9%88%E5%81%9A%E3%80%81%E8%B8%A9%E4%BA%86%E4%BB%80%E4%B9%88%E5%9D%91&amp;pic=%2Fimg%2Fpwa%2Ffavicon.png" title="Share to Weibo"><i class="solitude fab fa-weibo"></i></a><a class="social-share-ico icon-twitter" target="_blank" rel="noopener" href="https://twitter.com/intent/tweet?url=https%3A%2F%2Fhs3434.github.io%2Fhs3434.github.io%2F2025%2F06%2F08%2Ftransformer-eeg-decoding%2F&amp;text=GPT%20%E9%A3%8E%E6%A0%BC%20Transformer%20%E8%A7%A3%E7%A0%81%20EEG%EF%BC%9A%E4%B8%BA%E4%BB%80%E4%B9%88%E3%80%81%E6%80%8E%E4%B9%88%E5%81%9A%E3%80%81%E8%B8%A9%E4%BA%86%E4%BB%80%E4%B9%88%E5%9D%91" title="Share to Twitter"><i class="solitude fab fa-twitter"></i></a><a class="social-share-ico icon-facebook" target="_blank" rel="noopener" href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fhs3434.github.io%2Fhs3434.github.io%2F2025%2F06%2F08%2Ftransformer-eeg-decoding%2F" title="Share to Facebook"><i class="solitude fab fa-facebook"></i></a><a class="social-share-ico icon-telegram" target="_blank" rel="noopener" href="https://t.me/share/url?url=https%3A%2F%2Fhs3434.github.io%2Fhs3434.github.io%2F2025%2F06%2F08%2Ftransformer-eeg-decoding%2F&amp;text=GPT%20%E9%A3%8E%E6%A0%BC%20Transformer%20%E8%A7%A3%E7%A0%81%20EEG%EF%BC%9A%E4%B8%BA%E4%BB%80%E4%B9%88%E3%80%81%E6%80%8E%E4%B9%88%E5%81%9A%E3%80%81%E8%B8%A9%E4%BA%86%E4%BB%80%E4%B9%88%E5%9D%91" title="Share to Telegram"><i class="solitude fab fa-telegram"></i></a><a class="social-share-ico icon-whatsapp" target="_blank" rel="noopener" href="https://api.whatsapp.com/send?text=GPT%20%E9%A3%8E%E6%A0%BC%20Transformer%20%E8%A7%A3%E7%A0%81%20EEG%EF%BC%9A%E4%B8%BA%E4%BB%80%E4%B9%88%E3%80%81%E6%80%8E%E4%B9%88%E5%81%9A%E3%80%81%E8%B8%A9%E4%BA%86%E4%BB%80%E4%B9%88%E5%9D%91 https%3A%2F%2Fhs3434.github.io%2Fhs3434.github.io%2F2025%2F06%2F08%2Ftransformer-eeg-decoding%2F" title="Share to WhatsApp"><i class="solitude fab fa-whatsapp"></i></a><a class="social-share-ico icon-linkedin" target="_blank" rel="noopener" href="https://www.linkedin.com/shareArticle?mini=true&amp;url=https%3A%2F%2Fhs3434.github.io%2Fhs3434.github.io%2F2025%2F06%2F08%2Ftransformer-eeg-decoding%2F&amp;title=GPT%20%E9%A3%8E%E6%A0%BC%20Transformer%20%E8%A7%A3%E7%A0%81%20EEG%EF%BC%9A%E4%B8%BA%E4%BB%80%E4%B9%88%E3%80%81%E6%80%8E%E4%B9%88%E5%81%9A%E3%80%81%E8%B8%A9%E4%BA%86%E4%BB%80%E4%B9%88%E5%9D%91&amp;summary=undefined&amp;source=GPT%20%E9%A3%8E%E6%A0%BC%20Transformer%20%E8%A7%A3%E7%A0%81%20EEG%EF%BC%9A%E4%B8%BA%E4%BB%80%E4%B9%88%E3%80%81%E6%80%8E%E4%B9%88%E5%81%9A%E3%80%81%E8%B8%A9%E4%BA%86%E4%BB%80%E4%B9%88%E5%9D%91" title="Share to LinkedIn"><i class="solitude fab fa-linkedin"></i></a><div class="social-share-ico icon-link" onclick="utils.copy(&quot;https://hs3434.github.io/hs3434.github.io/2025/06/08/transformer-eeg-decoding/&quot;)" title="Share to Link"><i class="solitude fas fa-link"></i></div><div class="social-share-ico icon-qrcode" title="Share to QR code"><i class="solitude fas fa-qrcode"></i><div class="share-main"><div class="share-main-all"><div id="qrcode"></div><div class="reward-dec">Share to QR code</div></div></div><script pjax>typeof QRCode === 'function' && new QRCode(document.getElementById("qrcode"), {
+    text: 'https://hs3434.github.io/hs3434.github.io/2025/06/08/transformer-eeg-decoding/',
+    correctLevel : QRCode.CorrectLevel.L
+});
+window.addEventListener('DOMContentLoaded', () => {
+    new QRCode(document.getElementById("qrcode"), {
+        text: 'https://hs3434.github.io/hs3434.github.io/2025/06/08/transformer-eeg-decoding/',
+        correctLevel : QRCode.CorrectLevel.L
+    });
+});
+</script></div></div><div class="post-copyright__notice"><span class="post-copyright-info">This piece of writing is an original article, utilizing the<a target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh-hans">CC BY-NC-SA 4.0</a>Agreement. For complete reproduction, please acknowledge the source as Courtesy of<a href="/">Shane Hu</a></span></div></div><div class="post-tools-right"><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/eeg/"><span class="tags-punctuation"><i class="solitude fas fa-hashtag"></i>eeg<span class="tagsPageCount">2</span></span></a><a class="post-meta__tags" href="/tags/pytorch/"><span class="tags-punctuation"><i class="solitude fas fa-hashtag"></i>pytorch<span class="tagsPageCount">1</span></span></a><a class="post-meta__tags" href="/tags/transformer/"><span class="tags-punctuation"><i class="solitude fas fa-hashtag"></i>transformer<span class="tagsPageCount">1</span></span></a><a class="post-meta__tags" href="/tags/deep-learning/"><span class="tags-punctuation"><i class="solitude fas fa-hashtag"></i>deep-learning<span class="tagsPageCount">1</span></span></a></div></div></div><nav class="needEndHide pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2025/06/08/eeg-signal-processing-toolchain/"><div class="pagination-info"><div class="label">Previous</div><div class="prev_info">从零搭一套端到端 EEG 信号处理工具链</div></div></a></div><div class="next-post pull-right"><a href="/2025/03/06/250306/"><div class="pagination-info"><div class="label">Next</div><div class="next_info">vscode 使用问题与配置</div></div></a></div></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="card-content"><div class="card-info-avatar is-center"><div class="top-group"><div class="sayhi" id="sayhi" onclick="sco.changeWittyWord()"></div></div></div><div class="avatar"><img alt="Avatar" src= "/img/loading.gif" data-lazy-src="/img/head_porttrait.jpeg"></div><div class="description"></div><div class="bottom-group"><span class="left"><div class="name">Shane Hu</div><div class="desc">自建一切 · 深入原理 · 科学计算</div></span><div class="social-icons is-center"><a class="social-icon" target="_blank" rel="noopener" href="https://github.com/hs3434" title="Github"><i class="solitude  fab fa-github"></i></a></div></div></div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="solitude fas fa-bars"></i><span>Table of contents</span></div><div class="toc-content" id="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E7%94%A8-Transformer-%E8%A7%A3%E7%A0%81-EEG"><span class="toc-text">为什么用 Transformer 解码 EEG</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#EEG-%E4%B8%8D%E6%98%AF-NLP%EF%BC%9A%E4%B8%89%E4%B8%AA%E5%85%B3%E9%94%AE%E5%B7%AE%E5%BC%82"><span class="toc-text">EEG 不是 NLP：三个关键差异</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%9E%B6%E6%9E%84%E8%AE%BE%E8%AE%A1"><span class="toc-text">架构设计</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-Token-Embedding%EF%BC%9A%E4%B8%8D%E7%94%A8%E8%AF%8D%E8%A1%A8%EF%BC%8C%E7%94%A8%E5%8D%B7%E7%A7%AF"><span class="toc-text">1. Token Embedding：不用词表，用卷积</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-RoPE%EF%BC%9A%E8%AE%A9%E4%BD%8D%E7%BD%AE%E7%BC%96%E7%A0%81%E5%A4%96%E6%8E%A8"><span class="toc-text">2. RoPE：让位置编码外推</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-%E5%9B%A0%E6%9E%9C%E6%B3%A8%E6%84%8F%E5%8A%9B%EF%BC%9A%E5%8F%AA%E7%9C%8B%E8%BF%87%E5%8E%BB%EF%BC%8C%E4%B8%8D%E7%9C%8B%E6%9C%AA%E6%9D%A5"><span class="toc-text">3. 因果注意力：只看过去，不看未来</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-Pre-LN-%E6%AE%8B%E5%B7%AE%EF%BC%9A%E7%A8%B3%E5%AE%9A%E8%AE%AD%E7%BB%83"><span class="toc-text">4. Pre-LN + 残差：稳定训练</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-%E5%88%86%E7%B1%BB%E5%A4%B4%EF%BC%9A%E5%8F%96%E6%9C%80%E5%90%8E%E4%B8%80%E4%B8%AA%E4%BD%8D%E7%BD%AE"><span class="toc-text">5. 分类头：取最后一个位置</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#6-%E9%95%BF%E5%BA%A6%E8%87%AA%E9%80%82%E5%BA%94%E6%8E%A8%E7%90%86"><span class="toc-text">6. 长度自适应推理</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#7-%E9%80%90%E9%80%9A%E9%81%93-z-score-%E5%BD%92%E4%B8%80%E5%8C%96"><span class="toc-text">7. 逐通道 z-score 归一化</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%92%8C-CNN-%E8%A7%A3%E7%A0%81%E5%99%A8%E7%9A%84%E5%AF%B9%E6%AF%94"><span class="toc-text">和 CNN 解码器的对比</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%AE%AD%E7%BB%83%E7%BB%86%E8%8A%82"><span class="toc-text">训练细节</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%B8%A9%E8%BF%87%E7%9A%84%E5%9D%91"><span class="toc-text">踩过的坑</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%80%BB%E7%BB%93"><span class="toc-text">总结</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="solitude fas fa-map"></i><span>New posts</span></div><div class="aside-list"><a class="aside-list-item" href="/2026/06/08/calculus/" title="高等数学笔记"><div class="thumbnail"><img alt="高等数学笔记" src= "/img/loading.gif" data-lazy-src="/img/default.png"></div><div class="content"><span class="title" href="/2026/06/08/calculus/" title="高等数学笔记">高等数学笔记</span><span class="categories" href="/2026/06/08/calculus/">mathematics</span></div></a><a class="aside-list-item" href="/2026/06/08/dev-env/" title="开发环境搭建"><div class="thumbnail"><img alt="开发环境搭建" src= "/img/loading.gif" data-lazy-src="/img/default.png"></div><div class="content"><span class="title" href="/2026/06/08/dev-env/" title="开发环境搭建">开发环境搭建</span><span class="categories" href="/2026/06/08/dev-env/">software</span></div></a><a class="aside-list-item" href="/2026/06/08/slurm/" title="SLURM 集群安装配置"><div class="thumbnail"><img alt="SLURM 集群安装配置" src= "/img/loading.gif" data-lazy-src="/img/default.png"></div><div class="content"><span class="title" href="/2026/06/08/slurm/" title="SLURM 集群安装配置">SLURM 集群安装配置</span><span class="categories" href="/2026/06/08/slurm/">software</span></div></a><a class="aside-list-item" href="/2025/06/08/rnaseq-pipeline-engineering/" title="不满 Snakemake 的静态 rule？我用 Python 对象动态构建了一条 RNA-seq 流水线"><div class="content"><span class="title" href="/2025/06/08/rnaseq-pipeline-engineering/" title="不满 Snakemake 的静态 rule？我用 Python 对象动态构建了一条 RNA-seq 流水线">不满 Snakemake 的静态 rule？我用 Python 对象动态构建了一条 RNA-seq 流水线</span><span class="categories" href="/2025/06/08/rnaseq-pipeline-engineering/">engineering</span></div></a><a class="aside-list-item" href="/2025/06/08/eeg-signal-processing-toolchain/" title="从零搭一套端到端 EEG 信号处理工具链"><div class="content"><span class="title" href="/2025/06/08/eeg-signal-processing-toolchain/" title="从零搭一套端到端 EEG 信号处理工具链">从零搭一套端到端 EEG 信号处理工具链</span><span class="categories" href="/2025/06/08/eeg-signal-processing-toolchain/">engineering</span></div></a></div></div></div></div></main><footer id="footer"><div id="st-footer-bar"><div class="footer-logo"><span>主页</span></div><div class="footer-bar-description">来自 Shane Hu 的文章</div><a class="footer-bar-link" href="/about/">了解更多</a></div><div id="footer-bar"><div class="footer-bar-links"><div class="footer-bar-left"><div class="copyright">© 2024 - 2026 By&nbsp;<a class="footer-bar-link" href="/"><img class="author-avatar" src= "/img/loading.gif" data-lazy-src="/img/pwa/favicon.png">Shane Hu</a></div><div class="beian-group"><a class="footer-bar-link" target="_blank" rel="noopener" href="https://hexo.io/">Framework: Hexo</a><a class="footer-bar-link" target="_blank" rel="noopener" href="https://github.com/everfu/hexo-theme-solitude">Theme: Solitude</a></div></div></div></div></footer></div><!-- right_menu--><!-- inject body--><div><script src="/js/utils.js?v=3.0.14"></script><script src="/js/main.js?v=3.0.14"></script><script src="/js/third_party/waterfall.min.js?v=3.0.14"></script><script src="https://fastly.jsdelivr.net/npm/pjax@0.2.8/pjax.min.js"></script><script src="https://fastly.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script><script src="https://fastly.jsdelivr.net/npm/mermaid@11.4.1/dist/mermaid.min.js"></script><script src="https://fastly.jsdelivr.net/npm/typeit@8.8.7/dist/index.umd.min.js"></script><script src="/js/third_party/universe.min.js?v=3.0.14"></script><script>dark()
+</script><script src="/js/tw_cn.js?v=3.0.14"></script><script src="https://fastly.jsdelivr.net/npm/katex@0.16.21/dist/contrib/copy-tex.min.js"><script>(() => {
+  document.querySelectorAll('.article-container span.katex-display').forEach(item => {
+    utils.wrap(item, 'div', {class: 'katex-wrap'})
+  })
+})();
+</script></script><script src="https://fastly.jsdelivr.net/npm/vanilla-lazyload@19.1.3/dist/lazyload.iife.min.js"></script><script src="https://fastly.jsdelivr.net/npm/node-snackbar@0.1.16/dist/snackbar.min.js"></script><script>window.paceOptions = {
+  restartOnPushState: false
+}
+
+utils.addGlobalFn('pjaxSend', () => {
+  Pace.restart()
+}, 'pace_restart')
+</script><script src="https://fastly.jsdelivr.net/npm/pace-js@1.2.4/pace.min.js"></script><div class="js-pjax"><script>mermaid.run();
+</script></div></div><!-- pjax--><script>const pjax = new Pjax({
+    elements: 'a:not([target="_blank"])',
+    selectors: ["title","#body-wrap","#site-config","meta[name=\"description\"]",".js-pjax","meta[property^=\"og:\"]","#config-diff",".rs_show",".rs_hide"],
+    cacheBust: false,
+    analytics: false,
+    scrollRestoration: false
+})
+
+document.querySelectorAll('script[data-pjax]').forEach(item => {
+    const newScript = document.createElement('script')
+    const content = item.text || item.textContent || item.innerHTML || ""
+    Array.from(item.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value))
+    newScript.appendChild(document.createTextNode(content))
+    item.parentNode.replaceChild(newScript, item)
+})
+
+document.addEventListener('pjax:complete', () => {
+    window.refreshFn()
+
+    document.querySelectorAll('script[data-pjax]').forEach(item => {
+        const newScript = document.createElement('script')
+        const content = item.text || item.textContent || item.innerHTML || ""
+        Array.from(item.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value))
+        newScript.appendChild(document.createTextNode(content))
+        item.parentNode.replaceChild(newScript, item)
+    })
+
+    GLOBAL_CONFIG.islazyload && window.lazyLoadInstance.update()
+
+})
+
+document.addEventListener('pjax:error', (e) => {
+    if (e.request.status === 404) {
+        pjax.loadUrl('/404.html')
+    }
+})</script><!-- google adsense--><!-- search--><!-- music--></body></html>
+        <script>
+            const posts = ["2026/06/08/calculus/","2026/06/08/dev-env/","2026/06/08/slurm/","2025/06/08/rnaseq-pipeline-engineering/","2025/06/08/eeg-signal-processing-toolchain/","2025/06/08/transformer-eeg-decoding/","2025/03/06/250306/","2025/03/03/transformer1/","2024/06/20/2406202/","2024/06/20/240620/","2024/06/19/240619/","2024/06/06/vps-proxy/","2024/06/06/solitude/","2024/06/05/udesk2/","2024/06/05/udesk1/","2024/06/04/Advanced-Algebra/","2024/06/04/server/","2024/06/04/font/","2024/06/04/ydns/","2024/06/04/conda/","2024/06/04/bind9/","2024/06/04/openwrt/","2024/06/04/ssl/","2024/06/03/hexo/"];
+            function toRandomPost() {
+                const randomPost = posts[Math.floor(Math.random() * posts.length)];
+                pjax.loadUrl(GLOBAL_CONFIG.root + randomPost);
+            }
+        </script>
